@@ -2,6 +2,10 @@
 import RouterBackButton from "~/components/button/RouterBackButton.vue";
 import ResponseCode from "~/models/ResponseCode";
 
+definePageMeta({
+    middleware: 'auth',
+});
+
 const $q = useQuasar();
 const router = useRouter();
 const user = useUser();
@@ -40,8 +44,11 @@ const onKeydown = (e) => {
 
 const onDeleteUser = async () => {
     const {data} = await deleteUser();
-    const responseCode = ResponseCode.toResponseCode(data);
+    const responseCode = ResponseCode.toResponseCode(data.value);
     if (responseCode === ResponseCode.SUCCESS) {
+        const auth = useFirebaseAuth();
+        // reload user to force logout
+        await auth.currentUser.reload().catch(() => {});
         await router.push('/');
     } else {
         $q.notify({

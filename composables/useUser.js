@@ -57,7 +57,7 @@ async function deleteUser() {
         // TODO: handle other providers
         const provider = new GoogleAuthProvider();
         // reauthenticate user
-        reauthenticateWithPopup(auth.currentUser, provider).then(async () => {
+        return reauthenticateWithPopup(auth.currentUser, provider).then(async () => {
             return useFetch(`api/delete-user`, {
                 query: {idToken}
             });

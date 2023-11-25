@@ -3,7 +3,7 @@ import ResponseCode from "~/models/ResponseCode";
 
 export default defineEventHandler(async (event) => {
     return await useUserToken(event).then((user) => {
-        const {displayName, photoURL, bio, targetUser} = getQuery(event);
+        const {displayName, photoURL, bio, profilePrivate, targetUser} = getQuery(event);
         
         if (targetUser) {
             // TODO: validate permissions and update target profile
@@ -15,24 +15,23 @@ export default defineEventHandler(async (event) => {
                 return ResponseCode.NO_USER;
             }
             const data = {};
-            let dataChanged = false;
+            // displayName is required
             if (displayName && displayName !== doc.data().displayName) {
                 data.displayName = displayName;
-                dataChanged = true;
             }
-            if (photoURL && photoURL !== doc.data().photoURL) {
+            if (photoURL !== doc.data().photoURL) {
                 data.photoURL = photoURL;
-                dataChanged = true;
             }
-            if (bio && bio !== doc.data().bio) {
+            if (bio !== doc.data().bio) {
                 data.bio = bio;
-                dataChanged = true;
             }
-            if (dataChanged) {
-                userDocRef.update(data);
-            } else {
+            if (profilePrivate && profilePrivate !== doc.data().profilePrivate) {
+                data.profilePrivate = profilePrivate;
+            }
+            if (Object.keys(data).length === 0) {
                 return ResponseCode.NO_CHANGE;
             }
+            userDocRef.update(data);
             return ResponseCode.SUCCESS;
         }).catch((err) => {
             console.log('Error updating user profile: ' + err);

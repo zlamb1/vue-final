@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
                     displayName: user.name,
                     photoURL: user.picture,
                     bio: '',
+                    profilePrivate: false,
                     roles: {
                         user: true
                     }
