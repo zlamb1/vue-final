@@ -36,10 +36,7 @@ export default defineEventHandler(async (event) => {
             return ResponseCode.SUCCESS;
         }).catch((err) => {
             console.log('Error updating user profile: ' + err);
-            return {
-                responseCode: ResponseCode.UNKNOWN,
-                error: err
-            };
+            return ResponseCode.UNKNOWN
         });
     });
 });

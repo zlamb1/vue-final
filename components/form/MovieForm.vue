@@ -1,5 +1,4 @@
 <script setup>
-import useDarkTheme from "~/composables/useDarkTheme";
 import Movie from "~/models/Movie";
 
 const {qDark} = useDarkTheme();

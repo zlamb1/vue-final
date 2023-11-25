@@ -47,9 +47,7 @@ const saveChanges = async () => {
     }
 
     await fetch(apiUrl).then(async (response) => {
-        const txt = await response.text();
-        console.log(txt);
-        const responseCode = ResponseCode.toResponseCode(txt);
+        const responseCode = ResponseCode.toResponseCode(await response.text());
         switch (responseCode) {
             case ResponseCode.SUCCESS:
                 notify();

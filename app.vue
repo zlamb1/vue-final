@@ -1,8 +1,10 @@
 <script setup>
-import useDarkTheme from "~/composables/useDarkTheme";
 import SliderToggle from "~/components/toggle/SliderToggle.vue";
 
+const $q = useQuasar();
 const {dark, useDarkThemeTransition} = useDarkTheme();
+// load initial value
+$q.dark.set(dark.value);
 
 const darkModeSlider = ref(null);
 
@@ -16,17 +18,11 @@ function toggleDarkMode() {
         console.warn('cannot toggle dark mode without a slider reference!');
     }
 }
-
-const onClick = async () => {
-    const {data} = await useFetch('/api/hello');
-    console.log(data);
-}
 </script>
 
 <template>
     <q-layout>
         <AppHeader>
-            <q-btn @click="onClick"></q-btn>
             <SliderToggle active-color="yellow-2"
                           left-icon="light_mode"
                           left-icon-color="yellow-8"

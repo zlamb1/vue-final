@@ -10,6 +10,7 @@ initializeApp({
 });
 
 const firestore = admin.firestore();
+const auth = admin.auth();
 
 const useUserToken = async (event) => {
     const {idToken} = getQuery(event);
@@ -24,4 +25,4 @@ const useUserToken = async (event) => {
     }
 }
 
-export {firestore, useUserToken};
+export {firestore, auth, useUserToken};

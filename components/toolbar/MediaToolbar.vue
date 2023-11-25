@@ -1,6 +1,4 @@
 <script setup>
-import useDarkTheme from "~/composables/useDarkTheme";
-
 const {qDark} = useDarkTheme();
 
 const favoriteIcon = ref('favorite');

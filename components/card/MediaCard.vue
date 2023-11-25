@@ -1,5 +1,4 @@
 <script setup>
-import useDarkTheme from "~/composables/useDarkTheme";
 import MediaToolbar from "~/components/toolbar/MediaToolbar.vue";
 import {Media} from "~/models/Media";
 import MediaFactory from "~/models/factory/MediaFactory";

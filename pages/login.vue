@@ -1,10 +1,8 @@
 <script setup>
 import {EmailAuthProvider, GoogleAuthProvider} from 'firebase/auth';
 import 'firebaseui/dist/firebaseui.css';
-
 import RouterBackButton from "~/components/button/RouterBackButton.vue";
 import UserErrorCard from "~/components/card/UserErrorCard.vue";
-import useFirebaseAuthUI from "~/composables/useFirebaseAuthUI";
 
 const router = useRouter();
 const {authUI} = useFirebaseAuthUI();

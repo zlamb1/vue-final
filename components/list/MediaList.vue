@@ -1,19 +1,15 @@
 <script setup>
-import {useQuasar} from "quasar";
 import ConfirmationDialog from "~/components/dialog/ConfirmationDialog.vue";
 import DeleteList from "~/components/list/DeleteList.vue";
-import DynamicPopupEdit from "~/components/popup-edit/DynamicPopupEdit.vue";
 import EditDialog from "~/components/dialog/EditDialog.vue";
 import FilterList from "~/components/list/FilterList.vue";
 import MediaCard from "~/components/card/MediaCard.vue";
-import MediaToolbar from "~/components/toolbar/MediaToolbar.vue";
 import MediaForm from "~/components/form/MediaForm.vue";
 import Book from "~/models/Book";
 import {Filter} from "~/models/Filter";
 import {Media, MediaType} from "~/models/Media";
 import Movie from "~/models/Movie";
 import MediaCollection from "~/models/MediaCollection";
-import MediaFactory from "~/models/factory/MediaFactory";
 import MediaRow from "~/components/list/MediaRow.vue";
 
 const $q = useQuasar();

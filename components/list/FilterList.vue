@@ -1,5 +1,4 @@
 <script setup>
-import useDarkTheme from "~/composables/useDarkTheme";
 import {FilterOperator} from "~/models/Filter";
 
 const {qDark} = useDarkTheme();

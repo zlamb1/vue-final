@@ -1,6 +1,4 @@
 <script setup>
-import useDarkTheme from "~/composables/useDarkTheme";
-
 import MediaList from "~/components/list/MediaList.vue";
 
 const {dark} = useDarkTheme();

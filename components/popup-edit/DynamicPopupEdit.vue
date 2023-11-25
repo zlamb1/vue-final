@@ -1,6 +1,4 @@
 <script setup>
-import useDarkTheme from "~/composables/useDarkTheme";
-
 import PopupType from "~/models/PopupType";
 
 const {qDark} = useDarkTheme();

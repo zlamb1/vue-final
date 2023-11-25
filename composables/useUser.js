@@ -1,4 +1,4 @@
-import {onAuthStateChanged} from 'firebase/auth';
+import {onAuthStateChanged, reauthenticateWithPopup, GoogleAuthProvider} from 'firebase/auth';
 import {doc, onSnapshot} from "firebase/firestore";
 
 function useUser() {
@@ -50,4 +50,19 @@ async function signOutUser() {
     return auth.signOut();
 }
 
-export {useUser, useUserToken, signOutUser}
+async function deleteUser() {
+    const auth = useFirebaseAuth();
+    if (auth.currentUser) {
+        const idToken = await useUserToken();
+        // TODO: handle other providers
+        const provider = new GoogleAuthProvider();
+        // reauthenticate user
+        reauthenticateWithPopup(auth.currentUser, provider).then(async () => {
+            return useFetch(`api/delete-user`, {
+                query: {idToken}
+            });
+        });
+    }
+}
+
+export {useUser, useUserToken, signOutUser, deleteUser}

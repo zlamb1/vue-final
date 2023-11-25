@@ -4,6 +4,8 @@ import MediaToolbar from "~/components/toolbar/MediaToolbar.vue";
 import MediaFactory from "~/models/factory/MediaFactory";
 import {Media} from "~/models/Media";
 
+const {qDark} = useDarkTheme();
+
 defineProps({
     row: {
         type: Media,
@@ -39,7 +41,7 @@ const emit = defineEmits(['update:modelValue', 'edit']);
             {{ row.type }}
             <q-icon :name="MediaFactory.CreateIcon(row.type)"
                     class="float-right"
-                    color="primary"
+                    :color="qDark ? 'white' : 'accent'"
                     size="sm"/>
         </q-td>
     </q-tr>

@@ -1,5 +1,4 @@
 <script setup>
-import useDarkTheme from "~/composables/useDarkTheme";
 import Book from "~/models/Book";
 
 const {qDark} = useDarkTheme();

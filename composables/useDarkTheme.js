@@ -1,6 +1,4 @@
-import {useQuasar} from "quasar";
-
-const dark = ref(false);
+const dark = ref(Boolean(localStorage.getItem('useDarkTheme')));
 
 watch(dark, () => {
     localStorage.setItem('useDarkTheme', JSON.stringify(dark.value));
