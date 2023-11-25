@@ -1,0 +1,27 @@
+<script>
+import MediaView from "~/components/view/MediaView.vue";
+import Book from "~/models/Book";
+import PopupType from "~/models/PopupType";
+
+export default {
+    name: "BookView",
+    extends: MediaView,
+    data() {
+        return {
+            cols: {
+                author: {type: PopupType.Text, label: 'Author:'},
+                pagesRead: {type: PopupType.Number, label: 'Pages Read:'},
+                numberOfPages: {type: PopupType.Number, label: 'Number of Pages:'},
+                rating: {type: PopupType.Number, label: 'Rating (/5):'},
+                coverType: {type: PopupType.Select, label: 'Cover Type:', options: Book.CoverType.asArray()}
+            }
+        }
+    },
+    props: {
+        media: {
+            type: Book,
+            required: true,
+        },
+    },
+}
+</script>

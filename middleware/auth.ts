@@ -1,8 +1,10 @@
-export default defineNuxtRouteMiddleware((to, from) => {
-  const username = useState('username');
+import {useCurrentUser} from "vuefire";
 
-  if (!username.value) {
-    process.client && alert('Sorry, you need to fill your username');
-    return navigateTo('/middleware');
-  }
+export default defineNuxtRouteMiddleware(async (to) => {
+    // skip on server
+    if (process.server) return;
+    const user = useCurrentUser();
+    if (!user.value) {
+        return navigateTo({path: '/login', query: {redirect: to.fullPath}})
+    }
 });

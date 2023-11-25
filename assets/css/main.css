@@ -1,0 +1,98 @@
+/* General CSS */
+
+.q-layout {
+    overflow: hidden;
+}
+
+/* Utility Helper Classes */
+
+.fit-content {
+    width: fit-content;
+    height: fit-content;
+}
+
+.cursor-text {
+    cursor: text;
+}
+
+.notransition {
+    transition: none !important;
+}
+
+/* Scrollbar Customization */
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #e3e3e3;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--q-primary);
+    border: 1px solid #e3e3e3;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    filter: brightness(90%);
+}
+
+/* CSS Keyframes */
+
+@keyframes swing {
+    0% {
+        transform: translate(-50%, -50%) rotate(-20deg);
+    }
+    25% {
+        transform: translate(-50%, -125%) rotate(20deg);
+    }
+    50% {
+        transform: translate(var(--translation), -200%) rotate(-20deg);
+    }
+    75% {
+        transform: translate(var(--translation), -200%) rotate(20deg);
+    }
+    100% {
+        transform: translate(var(--translation), -200%) rotate(-20deg);
+    }
+}
+
+/* View Transition */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+    z-index: 1;
+}
+
+::view-transition-new(root) {
+    z-index: 9999;
+}
+
+.dark::view-transition-old(root) {
+    z-index: 9999;
+}
+
+.dark::view-transition-new(root) {
+    z-index: 1;
+}
+
+/* Vue Transitions */
+
+.fade-enter-active {
+    transition: all 0.3s ease-in;
+}
+
+.fade-leave-active {
+    transition: all 0.2s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
