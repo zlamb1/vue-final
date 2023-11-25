@@ -1,4 +1,4 @@
-const dark = ref(Boolean(localStorage.getItem('useDarkTheme')));
+const dark = ref(Boolean(JSON.parse(localStorage.getItem('useDarkTheme'))));
 
 watch(dark, () => {
     localStorage.setItem('useDarkTheme', JSON.stringify(dark.value));

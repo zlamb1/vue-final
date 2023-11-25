@@ -4,6 +4,7 @@ class ResponseCode {
     static USER_EXISTS = 2;
     static NO_CHANGE= 3;
     static NO_PERMS = 4;
+    static RESOURCE_NOT_FOUND = 5;
     
     static UNKNOWN = -1;
     

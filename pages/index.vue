@@ -1,7 +1,7 @@
 <script setup>
 import MediaList from "~/components/list/MediaList.vue";
 
-const {dark} = useDarkTheme();
+const {qDark} = useDarkTheme();
 
 const showGridView = ref(false);
 const showBackToTopBtn = ref(false);
@@ -43,7 +43,7 @@ onUnmounted(() => {
                 @click="onToggleView"
                 spread>
             </q-btn-toggle>
-            <q-btn color="blue-9" size="md" icon="public" flat round>
+            <q-btn :color="qDark ? 'white' : 'accent'" size="md" icon="public" flat round>
                 <q-tooltip class="bg-accent text-center">
                     Click to view the global media list.
                 </q-tooltip>
@@ -53,8 +53,8 @@ onUnmounted(() => {
         <div class="full-width row justify-center fixed-top q-ma-lg" style="z-index: 9999;" v-show="showBackToTopBtn">
             <q-btn
                 icon="keyboard_double_arrow_up"
-                :color="dark ? 'grey-6' : 'primary'"
-                :text-color="dark ? 'white' : 'grey-4'"
+                :color="qDark ? 'grey-6' : 'primary'"
+                :text-color="qDark ? 'white' : 'grey-4'"
                 @click="scrollToTop"
                 round>
             </q-btn>
