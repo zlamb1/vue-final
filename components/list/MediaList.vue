@@ -308,7 +308,7 @@ emit('updateShowGridView', showGridView.value);
                              :selected="selected"
                              @click-add="onClickAddBtn"
                              @click-delete="onClickDeleteBtn"
-                             @toggle-fullscreen="fullscreen = !fullscreen">u>
+                             @toggle-fullscreen="fullscreen = !fullscreen">
                 <q-checkbox class="q-ml-xs" color="grey-8" v-model="computedSelectAll" v-show="showGridView" />
             </MediaListHeader>
         </template>
