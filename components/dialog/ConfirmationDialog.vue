@@ -28,7 +28,6 @@ function closeDialog() {
 
 function onClickConfirm() {
     emit('confirm');
-    closeDialog();
 }
 
 defineExpose({showDialog, closeDialog});

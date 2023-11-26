@@ -32,7 +32,6 @@ function onRemoveFilter(filter) {
 
 function onClickItem(item) {
     emit('click-add', item);
-    dropdownBtn.value?.hide();
 }
 </script>
 

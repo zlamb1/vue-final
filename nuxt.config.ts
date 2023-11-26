@@ -1,7 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import materialIcons from 'quasar/icon-set/svg-material-icons';
+import materialIconsOutlined from 'quasar/icon-set/material-icons-outlined';
+import materialIconsRound from 'quasar/icon-set/svg-material-icons-round'
+
 export default defineNuxtConfig({
     ssr: false,
-    modules: ['nuxt-quasar-vite', 'nuxt-vuefire'],
+    modules: ['nuxt-quasar-ui', 'nuxt-vuefire'],
     components: {
         global: true,
         dirs: ['~/components'],
@@ -9,11 +13,15 @@ export default defineNuxtConfig({
     css: ['~/assets/css/main.css', '~/assets/css/icons.css'],
     quasar: {
         sassVariables: '~/assets/quasar.variables.scss',
-        css: [
-            '@quasar/extras/material-icons/material-icons.css',
-            '@quasar/extras/material-icons-outlined/material-icons-outlined.css',
-        ],
-        plugins: ['Dialog'],
+        plugins: ['AppFullscreen', 'Dialog'],
+        iconSet: {
+            ...materialIcons, materialIconsOutlined,
+            colorPicker: materialIconsRound.colorPicker,
+        },
+        extras: {
+            fontIcons: ['material-icons', 'material-icons-outlined'],
+            animations: 'all',
+        },
         config: {
             dark: false,
         }

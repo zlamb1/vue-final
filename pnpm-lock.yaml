@@ -23,9 +23,6 @@ dependencies:
   nuxt-quasar-ui:
     specifier: ^2.0.6
     version: 2.0.6(@quasar/extras@1.16.8)(quasar@2.14.0)
-  nuxt-quasar-vite:
-    specifier: ^1.0.12
-    version: 1.0.12(quasar@2.14.0)(sass@1.69.5)
   nuxt-vuefire:
     specifier: ^0.4.1
     version: 0.4.1(@firebase/app-types@0.9.0)(firebase-admin@11.11.1)(firebase@10.6.0)(vuefire@3.1.18)
@@ -5706,20 +5703,6 @@ packages:
       magicast: 0.2.11
       p-memoize: 7.1.1
       quasar: 2.14.0
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
-    dev: false
-
-  /nuxt-quasar-vite@1.0.12(quasar@2.14.0)(sass@1.69.5):
-    resolution: {integrity: sha512-oGa8TUGV+djVuECitSCZn5o+j1SW0QG5DGsOz8vqc+bEDM2+Q8sXyQZfzM8X8Gqzo0f5vb4Y4RY6AtSadQHYsA==}
-    peerDependencies:
-      quasar: ^2.7.1
-      sass: 1.32.12
-    dependencies:
-      '@nuxt/kit': 3.8.2
-      quasar: 2.14.0
-      sass: 1.69.5
     transitivePeerDependencies:
       - rollup
       - supports-color
