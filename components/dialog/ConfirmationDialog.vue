@@ -18,7 +18,7 @@ defineProps({
 
 const emit = defineEmits(['confirm']);
 
-function openDialog() {
+function showDialog() {
     show.value = true;
 }
 
@@ -28,9 +28,10 @@ function closeDialog() {
 
 function onClickConfirm() {
     emit('confirm');
+    closeDialog();
 }
 
-defineExpose({openDialog, closeDialog});
+defineExpose({showDialog, closeDialog});
 </script>
 
 <template>
@@ -46,16 +47,20 @@ defineExpose({openDialog, closeDialog});
             <q-card-actions align="right">
                 <q-btn label="Cancel"
                        color="primary"
-                       class="text-bold"
-                       style="width: 125px;"
-                       v-close-popup flat />
+                       class="text-bold btn-action"
+                       @click="closeDialog"
+                       flat />
                 <q-btn :label="btnText"
                        :color="btnColor"
-                       class="text-bold"
-                       style="width: 125px;"
-                       @click="onClickConfirm"
-                       v-close-popup />
+                       class="text-bold btn-action"
+                       @click="onClickConfirm" />
             </q-card-actions>
         </q-card>
     </q-dialog>
 </template>
+
+<style scoped>
+.btn-action {
+    width: 125px;
+}
+</style>

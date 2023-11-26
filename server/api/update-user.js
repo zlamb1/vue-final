@@ -19,13 +19,13 @@ export default defineEventHandler(async (event) => {
             if (displayName && displayName !== doc.data().displayName) {
                 data.displayName = displayName;
             }
-            if (photoURL !== doc.data().photoURL) {
+            if (photoURL !== undefined && photoURL !== doc.data().photoURL) {
                 data.photoURL = photoURL;
             }
-            if (bio !== doc.data().bio) {
+            if (bio !== undefined && bio !== doc.data().bio) {
                 data.bio = bio;
             }
-            if (profilePrivate && profilePrivate !== doc.data().profilePrivate) {
+            if (profilePrivate !== undefined && profilePrivate !== doc.data().profilePrivate) {
                 data.profilePrivate = profilePrivate;
             }
             if (Object.keys(data).length === 0) {
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
             return ResponseCode.SUCCESS;
         }).catch((err) => {
             console.log('Error updating user profile: ' + err);
-            return ResponseCode.UNKNOWN
+            return err;
         });
     });
 });

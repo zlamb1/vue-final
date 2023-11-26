@@ -1,5 +1,6 @@
 import {onAuthStateChanged, reauthenticateWithPopup, GoogleAuthProvider} from 'firebase/auth';
 import {doc, onSnapshot} from "firebase/firestore";
+import APIEndpoints from "~/models/Endpoints";
 
 function useUser() {
     const db = useFirestore();
@@ -23,10 +24,12 @@ function useUser() {
             unsub();
         }
         
-        user.signedIn = newUser !== null;
+        user.signedIn = false;
         if (newUser) {
             unsub = onSnapshot(doc(db, 'users', newUser.uid), (doc) => {
                 user.data = doc.data();
+                // only 'sign-in' user once data has been received
+                user.signedIn = true;
             });
         } else {
             // no user
@@ -58,7 +61,7 @@ async function deleteUser() {
         const provider = new GoogleAuthProvider();
         // reauthenticate user
         return reauthenticateWithPopup(auth.currentUser, provider).then(async () => {
-            return useFetch(`api/delete-user`, {
+            return useFetch(APIEndpoints.DELETE_USER, {
                 query: {idToken}
             });
         });

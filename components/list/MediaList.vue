@@ -2,11 +2,10 @@
 import ConfirmationDialog from "~/components/dialog/ConfirmationDialog.vue";
 import DeleteList from "~/components/list/DeleteList.vue";
 import EditDialog from "~/components/dialog/EditDialog.vue";
-import FilterList from "~/components/list/FilterList.vue";
 import MediaCard from "~/components/card/MediaCard.vue";
 import MediaForm from "~/components/form/MediaForm.vue";
+import MediaListHeader from "~/components/list/MediaListHeader.vue";
 import Book from "~/models/Book";
-import {Filter} from "~/models/Filter";
 import {Media, MediaType} from "~/models/Media";
 import Movie from "~/models/Movie";
 import MediaCollection from "~/models/MediaCollection";
@@ -155,6 +154,10 @@ function onClickAddBtn(mediaType) {
     addDialog.value.showDialog();
 }
 
+function onClickDeleteBtn() {
+    confirmDialog.value?.showDialog();
+}
+
 function onAddDialogSubmit(mediaItem) {
     mediaCollection.push(mediaItem);
     addDialog.value.hideDialog();
@@ -177,21 +180,9 @@ function onEditDialogSubmit(mediaItem) {
     editMediaItem.value = null;
 }
 
-function onClickDeleteSelected() {
-    confirmDialog.value.openDialog();
-}
-
 function deleteSelected() {
     mediaCollection.delete(selected.value);
     selected.value = [];
-}
-
-function onAddFilter(filterString) {
-    filters.value.push(new Filter(filterString));
-}
-
-function onRemoveFilter(filter) {
-    filters.value.splice(filters.value.indexOf(filter), 1);
 }
 
 function setShowGridView(_new) {
@@ -312,56 +303,20 @@ emit('updateShowGridView', showGridView.value);
         ref="table"
         square>
         <template #top>
-            <div class="column full-width q-gutter-y-sm" :class="{'q-pb-sm' : showGridView}">
-                <div class="row items-center q-gutter-x-md">
-                    <div class="q-table__title text-h5 non-selectable text-bold">
-                        {{tableTitle}}
-                    </div>
-                    <q-checkbox class="q-ml-xs" color="grey-8" v-model="computedSelectAll" v-show="showGridView" />
-                    <q-space />
-                    <q-btn-dropdown
-                        class="state-btn text-caption text-bold"
-                        label="Add Item"
-                        :color="useDarkTheme ? 'green-8' : 'green-6'"
-                        stretch>
-                        <q-list v-for="item in MediaType" :key="item">
-                            <q-item class="text-white text-caption"
-                                    :class="useDarkTheme ? 'bg-green-8' : 'bg-green-6'"
-                                    @click="onClickAddBtn(item)"
-                                    clickable
-                                    v-close-popup>
-                                <q-item-section>
-                                    <q-item-label>{{item}}</q-item-label>
-                                </q-item-section>
-                            </q-item>
-                        </q-list>
-                    </q-btn-dropdown>
-                    <q-btn
-                        class="state-btn text-caption text-bold"
-                        color="red"
-                        :label="selected.length > 1 ? 'Delete Items' : 'Delete Item'"
-                        v-show="selected.length > 0"
-                        @click="onClickDeleteSelected"
-                        stretch />
-                    <q-btn
-                        icon="fullscreen"
-                        v-show="!showGridView"
-                        @click="fullscreen = !fullscreen" />
-                </div>
-                <FilterList
-                    class="q-mx-md"
-                    :filters="filters"
-                    @add-filter="onAddFilter"
-                    @remove-filter="onRemoveFilter"
-                    @remove-filters="filters = []"
-                    ref="filterList" />
-            </div>
+            <MediaListHeader :table-title="tableTitle"
+                             :show-grid-view="showGridView"
+                             :selected="selected"
+                             @click-add="onClickAddBtn"
+                             @click-delete="onClickDeleteBtn"
+                             @toggle-fullscreen="fullscreen = !fullscreen">u>
+                <q-checkbox class="q-ml-xs" color="grey-8" v-model="computedSelectAll" v-show="showGridView" />
+            </MediaListHeader>
         </template>
         <template #header-selection>
-            <q-checkbox color="grey-8" v-model="computedSelectAll"></q-checkbox>
+            <q-checkbox color="grey-8" v-model="computedSelectAll" />
         </template>
         <template #body="props">
-            <MediaRow :row="props.row">
+            <MediaRow @edit="openEditDialog(props.row)" :row="props.row">
                 <q-checkbox :val="props.row" v-model="selected" color="grey-8" />
             </MediaRow>
         </template>

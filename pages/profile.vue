@@ -11,7 +11,6 @@ definePageMeta({
 });
 
 const $q = useQuasar();
-const router = useRouter();
 const user = useUser();
 const {qDark} = useDarkTheme();
 

@@ -1,6 +1,8 @@
 <script setup>
 import RouterBackButton from "~/components/button/RouterBackButton.vue";
 import ResponseCode from "~/models/ResponseCode";
+import APIEndpoints from "~/models/Endpoints";
+import useNotify from "~/composables/useNotify";
 
 definePageMeta({
     middleware: 'auth',
@@ -11,6 +13,8 @@ const router = useRouter();
 const user = useUser();
 const {qDark} = useDarkTheme();
 
+const profilePrivate = ref(false);
+const mediaListPrivate = ref(true);
 const deleteInputText = ref('');
 const deleteConfirmed = ref(false);
 
@@ -28,11 +32,25 @@ const shadowText = computed(() => {
     return text.value;
 });
 
-const modelValueUpdate = (newValue) => {
+const {notifyPositive, notifyNegative} = useNotify();
+async function onCheckProfilePrivate(newValue) {
+    const idToken = await useUserToken();
+    const {data} = await useFetch(APIEndpoints.UPDATE_USER, {
+       query: {idToken, profilePrivate: newValue}
+    });
+    const responseCode = ResponseCode.toResponseCode(data.value);
+    if (responseCode === ResponseCode.SUCCESS) {
+        notifyPositive();
+    } else {
+        notifyNegative();
+    }
+}
+
+function modelValueUpdate(newValue) {
     deleteConfirmed.value = newValue === text.value;
 }
 
-const onKeydown = (e) => {
+function onKeydown(e) {
     // they pressed tab
     if (e.keyCode === 9) {
         deleteInputText.value = text.value;
@@ -42,7 +60,7 @@ const onKeydown = (e) => {
     }
 }
 
-const onDeleteUser = async () => {
+async function onDeleteUser() {
     const {data} = await deleteUser();
     const responseCode = ResponseCode.toResponseCode(data.value);
     if (responseCode === ResponseCode.SUCCESS) {
@@ -59,6 +77,12 @@ const onDeleteUser = async () => {
         })
     }
 }
+
+watch(user, (newUser) => {
+    if (newUser.signedIn) {
+        profilePrivate.value = Boolean(JSON.parse(newUser.data?.profilePrivate));
+    }
+});
 </script>
 
 <template>
@@ -74,12 +98,12 @@ const onDeleteUser = async () => {
                     <q-list>
                         <q-item tag="label" v-ripple>
                             <q-item-section avatar>
-                                <q-checkbox color="accent" label="Make Profile Public" />
+                                <q-checkbox v-model="profilePrivate" @update:model-value="onCheckProfilePrivate" color="accent" label="Make Profile Private" />
                             </q-item-section>
                         </q-item>
                         <q-item tag="label" v-ripple>
                             <q-item-section avatar>
-                                <q-checkbox color="accent" label="Make Media List Public" />
+                                <q-checkbox v-model="mediaListPrivate" color="accent" label="Make Media List Private" />
                             </q-item-section>
                         </q-item>
                     </q-list>

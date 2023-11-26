@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     },
     css: ['~/assets/css/main.css', '~/assets/css/icons.css'],
     quasar: {
+        sassVariables: '~/assets/quasar.variables.scss',
         css: [
             '@quasar/extras/material-icons/material-icons.css',
             '@quasar/extras/material-icons-outlined/material-icons-outlined.css',
@@ -15,19 +16,6 @@ export default defineNuxtConfig({
         plugins: ['Dialog'],
         config: {
             dark: false,
-            brand: {
-                primary: '#48191f',
-                secondary: '#26A69A',
-                accent: '#194842',
-
-                dark: '#3a3939',
-                'dark-page': '#3a3939',
-
-                positive: '#21BA45',
-                negative: '#C10015',
-                info: '#31CCEC',
-                warning: '#F2C037'
-            }
         }
     },
     vuefire: {

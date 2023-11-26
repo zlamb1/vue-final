@@ -1,5 +1,6 @@
 <script setup>
 import SliderToggle from "~/components/toggle/SliderToggle.vue";
+import useBookApi from "~/composables/useBookApi";
 
 const $q = useQuasar();
 const {dark, useDarkThemeTransition} = useDarkTheme();

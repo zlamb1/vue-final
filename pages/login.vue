@@ -3,6 +3,7 @@ import {EmailAuthProvider, GoogleAuthProvider} from 'firebase/auth';
 import 'firebaseui/dist/firebaseui.css';
 import RouterBackButton from "~/components/button/RouterBackButton.vue";
 import UserErrorCard from "~/components/card/UserErrorCard.vue";
+import APIEndpoints from "~/models/Endpoints";
 
 const router = useRouter();
 const {authUI} = useFirebaseAuthUI();
@@ -19,11 +20,11 @@ onMounted(() => {
                 if (authResult?.additionalUserInfo.isNewUser) {
                     // tell server to initialize user
                     new Promise(async () => {
-                        const userToken = await useUserToken();
-                        const apiUrl = `/api/initialize-user?idToken=${userToken}`;
-                        fetch(apiUrl).then(() => {
-                            router.push('/');
+                        const idToken = await useUserToken();
+                        await useFetch(APIEndpoints.INITIALIZE_USER, {
+                            query: {idToken}
                         });
+                        await router.push('/');
                     });
                 } else {
                     router.push('/');
