@@ -25,14 +25,21 @@ export default {
             required: true,
         }
     },
+    methods: {
+        renderCol(col) {
+            if (this.cols[col].type === PopupType.Array) {
+                return this.media[col].length > 0;
+            }
+            return Boolean(this.media[col]);
+        }
+    },
 }
-
 </script>
 
 <template>
     <q-card-section class="q-pa-md">
         <div class="cursor-text" v-for="col in Object.keys(cols)" :key="cols[col].label" @click.stop>
-            <div v-if="media[col]">
+            <div v-if="renderCol(col)">
                 <span class="q-table__grid-item-title non-selectable q-mr-xs">
                     {{cols[col].label}}
                 </span>
