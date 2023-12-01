@@ -5,6 +5,7 @@ const {qDark} = useDarkTheme();
 
 const dialog = ref(null);
 const descDialog = ref(null);
+const searchInput = ref(null);
 
 const books = ref([]);
 const selectedBook = ref(null);
@@ -20,17 +21,21 @@ const awaitingFetch = ref(false);
 const maxResults = ref(10);
 
 const props = defineProps({
-    existingBooks: {
+    books: {
         type: Array,
         default: Array(),
     }
 });
 
-const emit = defineEmits(['import']);
+const emit = defineEmits(['import', 'remove']);
 
 const computedNoResultsText = computed(() => {
     return search.value && searchPerformed.value ? 'Try another search term' : 'Try searching with a search term'
 });
+
+function onShow() {
+    searchInput.value?.$el.focus();
+}
 
 const {queryApi, limit} = useBookApi();
 function onSearch() {
@@ -58,6 +63,13 @@ function onSearch() {
     }
 }
 
+function onRemove(book) {
+    const foundBook = findBookByIsbn(book);
+    if (foundBook) {
+        emit('remove', foundBook);
+    }
+}
+
 function trimDescription(desc) {
     const maxLength = 150;
     let str = desc;
@@ -68,19 +80,34 @@ function trimDescription(desc) {
     }
 }
 
-function bookExists(book) {
+function findBookByIsbn(book) {
+    let foundBook = undefined;
     const identifiers = book?.volumeInfo?.industryIdentifiers;
     if (identifiers) {
-        let found = false;
-        props.existingBooks.forEach((isbn) => {
-            identifiers.forEach((isbnObject) => {
-                if (isbn === isbnObject.identifier) {
-                    found = true;
-                    return;
-                }
+        identifiers.every((id) => {
+            let cont = true;
+            props.books.every((book) => {
+                let _cont = true;
+                book.isbn.every((isbn) => {
+                    if (isbn === id) {
+                        cont = false;
+                        _cont = false;
+                        foundBook = book;
+                        return false;
+                    }
+                    return true;
+                });
+                return _cont;
             });
+            return cont;
         });
-        return found;
+    }
+    return foundBook;
+}
+
+function bookExists(book) {
+    if (findBookByIsbn(book)) {
+        return true;
     }
     return false;
 }
@@ -102,7 +129,7 @@ defineExpose({show});
 </script>
 
 <template>
-    <q-dialog ref="dialog" maximized>
+    <q-dialog ref="dialog" @show="onShow" maximized>
         <q-card class="column no-wrap">
             <q-card-section class="row items-center q-gutter-md" :class="qDark ? 'text-white' : 'text-primary'">
                 <q-icon name="library_books" size="sm" />
@@ -118,6 +145,7 @@ defineExpose({show});
                          v-model="search"
                          @search="onSearch"
                          @clear="onSearch"
+                         ref="searchInput"
                          filled>
                     <template #append>
                         <q-spinner-dots class="on-right" v-show="awaitingFetch" />
@@ -172,7 +200,7 @@ defineExpose({show});
                                         </q-btn>
                                     </q-card-section>
                                     <q-card-section class="row q-mt-auto">
-                                        <q-btn v-if="bookExists(book)" color="red" icon="remove" round>
+                                        <q-btn v-if="bookExists(book)" color="red" icon="remove" @click="onRemove(book)" round>
                                             <q-tooltip class="bg-red-8">
                                                 Remove from media list
                                             </q-tooltip>

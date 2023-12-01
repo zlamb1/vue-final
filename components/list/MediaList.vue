@@ -141,19 +141,17 @@ const computedSelectAll = computed({
     }
 });
 
-const computedISBNArray = computed(() => {
-    const array = [];
+const computedISBNBooks = computed(() => {
+    const books = [];
     mediaCollection.forEach((mediaItem) => {
         if (mediaItem.type === MediaType.Book) {
             const book = mediaItem.media;
             if (book && book.isbn) {
-                book.isbn.forEach((isbn) => {
-                    array.push(isbn.identifier);
-                });
+                books.push(book);
             }
         }
     });
-    return array;
+    return books;
 });
 
 function onClickAddBtn(mediaType) {
@@ -202,6 +200,16 @@ function onImportBook(item) {
     const book = Book.ConvertFromGoogleBookAPI(item);
     const mediaItem = new Media(book);
     mediaCollection.push(mediaItem);
+}
+
+function onRemoveImport(book) {
+    for (let i = 0; i < mediaCollection.length; i++) {
+        const mediaItem = mediaCollection[i];
+        if (mediaItem.media === book) {
+            mediaCollection.splice(i, 1);
+            break;
+        }
+    }
 }
 
 function deleteSelected() {
@@ -291,9 +299,9 @@ defineExpose({top});
         btnColor="red"
         @confirm="deleteSelected"
         ref="confirmDialog">
-        <DeleteList :selected="selected" @empty="confirmDialog.closeDialog()"></DeleteList>
+        <DeleteList :selected="selected" @empty="confirmDialog.closeDialog()" />
     </ConfirmationDialog>
-    <BookAPIDialog :existing-books="computedISBNArray" @import="onImportBook" ref="bookApiDialog" />
+    <BookAPIDialog :books="computedISBNBooks" @import="onImportBook" @remove="onRemoveImport" ref="bookApiDialog" />
     <q-table
         class="q-mx-none"
         :style="qDark && tab === 'table' ? 'border: 1px solid hsla(0,0%,100%,.28)' : null"
