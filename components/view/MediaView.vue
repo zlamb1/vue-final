@@ -39,6 +39,9 @@ export default {
                 <span class="q-table__grid-item-value non-selectable" v-if="cols[col].type === PopupType.Date">
                     {{new Date(media[col]).toLocaleString('en-US', cols[col].dateFormat ?? {})}}
                 </span>
+                <span class="q-table__grid-item-value non-selectable" v-else-if="cols[col].formatter">
+                    {{cols[col].formatter(media[col])}}
+                </span>
                 <span class="q-table__grid-item-value non-selectable" v-else>
                     {{media[col]}}
                 </span>

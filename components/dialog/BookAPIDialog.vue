@@ -39,7 +39,6 @@ function onSearch() {
         queryApi(search.value, maxResults.value).then((response) => {
             const items = response.data?.value?.items;
             if (items) {
-                console.log(items);
                 books.value = items;
                 totalItemsReturned.value = items.length;
                 totalItems.value = response.data?.value?.totalItems;
@@ -72,13 +71,16 @@ function trimDescription(desc) {
 function bookExists(book) {
     const identifiers = book?.volumeInfo?.industryIdentifiers;
     if (identifiers) {
+        let found = false;
         props.existingBooks.forEach((isbn) => {
             identifiers.forEach((isbnObject) => {
                 if (isbn === isbnObject.identifier) {
-                    return true;
+                    found = true;
+                    return;
                 }
             });
         });
+        return found;
     }
     return false;
 }
@@ -189,7 +191,7 @@ defineExpose({show});
                                 </q-card-section>
                                 <q-separator vertical />
                                 <q-card-section v-if="book.volumeInfo?.imageLinks?.thumbnail" class="row justify-center items-center fit">
-                                    <q-img fit='cover' :src="book.volumeInfo?.imageLinks?.thumbnail" :img-style="{imageRendering: 'high-quality'}" />
+                                    <q-img fit="cover" :src="book.volumeInfo?.imageLinks?.thumbnail" :img-style="{imageRendering: 'high-quality'}" />
                                 </q-card-section>
                             </q-card-section>
                         </q-card>

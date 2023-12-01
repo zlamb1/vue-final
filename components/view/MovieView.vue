@@ -2,6 +2,7 @@
 import MediaView from "~/components/view/MediaView.vue";
 import Movie from "~/models/Movie";
 import PopupType from "~/models/PopupType";
+import {mapArray} from "~/models/Book";
 
 export default {
     name: "MovieView",
@@ -9,7 +10,7 @@ export default {
     data() {
         return {
             cols: {
-                directors: {type: PopupType.Array, label: 'Directors:', options: 'Director'},
+                directors: {type: PopupType.Array, label: 'Directors:', options: 'Director', formatter: mapArray},
                 releaseDate: {type: PopupType.Date, label: 'Release Date:', dateFormat: this.media.dateFormatOptions },
                 runTime: {type: PopupType.Text, label: 'Runtime:'},
             }

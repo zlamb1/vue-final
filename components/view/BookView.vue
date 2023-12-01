@@ -1,6 +1,6 @@
 <script>
 import MediaView from "~/components/view/MediaView.vue";
-import Book from "~/models/Book";
+import Book, {mapArray} from "~/models/Book";
 import PopupType from "~/models/PopupType";
 
 export default {
@@ -9,7 +9,7 @@ export default {
     data() {
         return {
             cols: {
-                authors: {type: PopupType.Array, label: 'Authors:', options: 'Author'},
+                authors: {type: PopupType.Array, label: 'Authors:', options: 'Author', formatter: mapArray},
                 pagesRead: {type: PopupType.Number, label: 'Pages Read:'},
                 numberOfPages: {type: PopupType.Number, label: 'Number of Pages:'},
                 rating: {type: PopupType.Number, label: 'Rating (/5):'},
