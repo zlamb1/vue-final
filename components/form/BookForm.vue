@@ -1,5 +1,6 @@
 <script setup>
 import Book from "~/models/Book";
+import ArrayInput from "~/components/input/ArrayInput.vue";
 
 const {qDark} = useDarkTheme();
 
@@ -18,7 +19,6 @@ const props = defineProps({
     },
 });
 
-const mediaClone = ref(props.media.clone());
 const firstInput = ref(null);
 
 const computedInputColor = computed(() => {
@@ -31,15 +31,7 @@ function focusFirstInput() {
     firstInput.value.focus();
 }
 
-function getMediaClone() {
-    return mediaClone.value;
-}
-
-watch(props.media, async (_new) => {
-    mediaClone.value = _new.clone();
-});
-
-defineExpose({focusFirstInput, getMediaClone});
+defineExpose({focusFirstInput});
 </script>
 
 <template>
@@ -48,25 +40,18 @@ defineExpose({focusFirstInput, getMediaClone});
         label="Title"
         :color="computedInputColor"
         :rules="[value => !!value || 'What is the book\'s title?']"
-        v-model="mediaClone.title"
+        v-model="media.title"
         ref="firstInput"
         stack-label>
     </q-input>
-    <q-input
-        class="q-py-none"
-        label="Author"
-        :color="computedInputColor"
-        :rules="[value => !!value || 'Who wrote the book?']"
-        v-model="mediaClone.author"
-        stack-label>
-    </q-input>
+    <array-input label="Author" :allow-zero-inputs="true" v-model="media.authors" max-height="200px" />
     <q-input
         class="q-py-none"
         type="number"
         label="Pages Read"
         :color="computedInputColor"
         :rules="[value => !!value.toString() || 'How many pages have you read?']"
-        v-model.number="mediaClone.pagesRead"
+        v-model.number="media.pagesRead"
         stack-label>
     </q-input>
     <q-input
@@ -75,7 +60,7 @@ defineExpose({focusFirstInput, getMediaClone});
         label="Number of Pages"
         :color="computedInputColor"
         :rules="[value => !!value.toString() || 'What is the page count of the book?']"
-        v-model.number="mediaClone.numberOfPages"
+        v-model.number="media.numberOfPages"
         stack-label>
     </q-input>
     <q-input
@@ -85,7 +70,7 @@ defineExpose({focusFirstInput, getMediaClone});
         suffix="/5"
         :color="computedInputColor"
         :rules="[value => !!value.toString() || 'What do you rate the book?']"
-        v-model.number="mediaClone.rating"
+        v-model.number="media.rating"
         stack-label>
     </q-input>
     <q-select
@@ -93,14 +78,14 @@ defineExpose({focusFirstInput, getMediaClone});
         label="Cover Type"
         :color="computedInputColor"
         :options="Book.CoverType.asArray()"
-        v-model="mediaClone.coverType"
+        v-model="media.coverType"
         stack-label>
     </q-select>
     <q-input
         class="q-py-none"
         label="Cover URL (optional)"
         :color="computedInputColor"
-        v-model="mediaClone.imageUrl"
+        v-model="media.imageUrl"
         stack-label>
     </q-input>
 </template>

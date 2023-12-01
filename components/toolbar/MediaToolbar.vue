@@ -69,7 +69,6 @@ watch(computedFavorite, async (_new) => {
                 }
 
                 heartEmits.value++;
-                console.log(heartEmits.value);
                 setTimeout(() => {
                     const heart = favoriteContainer.value.querySelectorAll('.heart-emit')[i];
                     const theta = -50 + (Math.random() * 150 - 75);

@@ -6,7 +6,7 @@ import {Media} from "~/models/Media";
 
 const {qDark} = useDarkTheme();
 
-defineProps({
+const props = defineProps({
     row: {
         type: Media,
         required: true,

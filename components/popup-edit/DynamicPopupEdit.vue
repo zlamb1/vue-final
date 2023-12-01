@@ -1,7 +1,10 @@
 <script setup>
 import PopupType from "~/models/PopupType";
+import ArrayInput from "~/components/input/ArrayInput.vue";
 
 const {qDark} = useDarkTheme();
+
+const popupEdit = ref(null);
 
 defineProps({
     type: {
@@ -9,8 +12,7 @@ defineProps({
         default: PopupType.Text,
     },
     options: {
-        type: Array,
-        default: () => [],
+        default: Array(),
     },
 });
 
@@ -21,7 +23,10 @@ const computedColor = computed(() => {
 
 <template>
     <q-popup-edit :buttons="type === PopupType.Select || type === PopupType.Date"
-                  :color="computedColor" v-slot="scope">
+                  :color="computedColor"
+                  v-slot="scope"
+                  ref="popupEdit"
+                  auto-save>
         <div v-if="type === PopupType.Number">
             <q-input
                 type="number"
@@ -42,6 +47,9 @@ const computedColor = computed(() => {
         </div>
         <div class="row justify-center" v-else-if="type === PopupType.Date">
             <q-date v-model="scope.value" minimal></q-date>
+        </div>
+        <div v-else-if="type === PopupType.Array">
+            <array-input v-model="scope.value" :label="options" @empty="popupEdit.hide()" />
         </div>
         <div v-else>
             <q-input

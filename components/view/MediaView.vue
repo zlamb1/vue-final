@@ -34,14 +34,14 @@ export default {
         <div class="cursor-text" v-for="col in Object.keys(cols)" :key="cols[col].label" @click.stop>
             <div v-if="media[col]">
                 <span class="q-table__grid-item-title non-selectable q-mr-xs">
-                {{cols[col].label}}
-            </span>
+                    {{cols[col].label}}
+                </span>
                 <span class="q-table__grid-item-value non-selectable" v-if="cols[col].type === PopupType.Date">
-                {{new Date(media[col]).toLocaleString('en-US', cols[col].dateFormat ?? {})}}
-            </span>
+                    {{new Date(media[col]).toLocaleString('en-US', cols[col].dateFormat ?? {})}}
+                </span>
                 <span class="q-table__grid-item-value non-selectable" v-else>
-                {{media[col]}}
-            </span>
+                    {{media[col]}}
+                </span>
                 <DynamicPopupEdit v-model="media[col]" :type="cols[col].type" :options="cols[col].options ?? null"></DynamicPopupEdit>
             </div>
         </div>

@@ -1,20 +1,26 @@
 <script setup>
 import {useUser, signOutUser} from "~/composables/useUser";
 import useDarkTheme from "~/composables/useDarkTheme";
+import {QImg} from "quasar";
 
-const router = useRouter();
 const user = useUser();
 const {qDark} = useDarkTheme();
+
+const avatarImgLoaded = ref(false);
 
 const computedColor = computed(() => {
     return qDark.value ? 'white' : 'primary';
 });
+
+const computedAvatarIcon = computed(() => {
+    return avatarImgLoaded.value ? undefined : 'account_circle';
+})
 </script>
 
 <template>
     <q-header class="row transparent">
         <q-toolbar>
-            <q-avatar icon="menu_book" size="64px" :text-color="computedColor"></q-avatar>
+            <q-avatar icon="menu_book" size="64px" :text-color="computedColor" />
             <q-btn :text-color="computedColor"
                    class="text-bold"
                    label="The Library"
@@ -33,10 +39,12 @@ const computedColor = computed(() => {
                             {{user.data?.displayName}}
                         </span>
                         <q-skeleton v-if="user.loading" class="on-right" type="QAvatar" />
-                        <q-avatar v-else-if="user.data?.photoURL" class="on-right" size="lg">
-                            <q-img :src="user.data?.photoURL" />
+                        <q-avatar v-else class="on-right" :icon="computedAvatarIcon" size="md" rounded>
+                            <q-img :src="user.data?.photoURL"
+                                   referrerpolicy="no-referrer"
+                                   @load="avatarImgLoaded = true"
+                                   @error="avatarImgLoaded = false" />
                         </q-avatar>
-                        <q-avatar v-else class="on-right" size="xl" icon="account_circle" />
                         <q-menu class="overflow-auto" fit>
                             <q-list class="text-white text-bold">
                                 <q-item class="bg-accent row justify-between"
@@ -92,7 +100,7 @@ const computedColor = computed(() => {
 <style scoped>
     .display-name {
         font-variant-caps: small-caps;
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
     .q-item.q-router-link--active {
         color: white !important;

@@ -10,26 +10,27 @@ import {Media, MediaType} from "~/models/Media";
 import Movie from "~/models/Movie";
 import MediaCollection from "~/models/MediaCollection";
 import MediaRow from "~/components/list/MediaRow.vue";
+import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
 
-const $q = useQuasar();
+const {qDark} = useDarkTheme();
 
 const mediaCollection = reactive(new MediaCollection([
-    new Media(new Book('The Housemaid', 'Fredia McFadden', 28, 336, 4, 'Paperback', 'https://m.media-amazon.com/images/I/51+UxIo+YNL.jpg', false)),
-    new Media(new Movie('Oppenheimer', 'Christopher Nolan', '2023/07/21', '3:06', 'https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_.jpg')),
-    new Media(new Book('48 Laws of Power', 'Robert Green', 16, 480, 4, 'Paperback', 'https://m.media-amazon.com/images/I/31tnyOf+-sL._SY445_SX342_.jpg', false)),
-    new Media(new Book('Holly', 'Stephen King', 8, 464, 3, 'Hardcover', 'https://m.media-amazon.com/images/I/51J9mQz4SrL.jpg', false)),
-    new Media(new Book('Diary of a Wimpy Kid', 'Jeff Kinney', 3, 221, 4, 'Paperback', 'https://m.media-amazon.com/images/I/51cNlR3+BEL.jpg', false)),
-    new Media(new Book('The Sword of Summer: Magnus Chase and the Gods of Asgard', 'Rick Riordan', 5, 531, 4, 'Kindle', 'https://m.media-amazon.com/images/I/615Dt5+caxL.jpg', false)),
-    new Media(new Book('The Outsiders', 'S. E. Hilton', 14, 192, 4, 'Paperback', 'https://m.media-amazon.com/images/I/41ZUA+0GI8L.jpg', false)),
-    new Media(new Book('Farenheit 451', 'Ray Bradbury', 7, 272, 4, 'Paperback', 'https://m.media-amazon.com/images/I/41VXKfFmVwL.jpg', false)),
-    new Media(new Book('The Very Hungry Caterpillar', 'Eric Carle', 23, 32, 4, 'Kindle', 'https://m.media-amazon.com/images/I/51VAbILVUPL.jpg', false)),
-    new Media(new Book('Goodnight Moon', 'Margaret Wise Brown', 19, 32, 4, 'Hardcover', 'https://m.media-amazon.com/images/I/61BnppyErjL.jpg', false)),
-    new Media(new Book('Happy Birthday to You!', 'Dr. Seuss', 13, 64, 4, 'Hardcover', 'https://m.media-amazon.com/images/I/51xHgwuohnL._SY445_SX342_.jpg', false)),
-    new Media(new Book('One Fish Two Fish Red Fish Blue Fish', 'Dr. Seuss', 9, 72, 5, 'Hardcover', 'https://m.media-amazon.com/images/I/51YWnlLkblL._SY445_SX342_.jpg', false)),
-    new Media(new Book('The Lost Hero', 'Rick Riordan', 187, 592, 3, 'Hardcover', 'https://m.media-amazon.com/images/I/51Esx9gaGiL.jpg', false)),
-    new Media(new Book('The Outsider', 'Stephen King', 203, 576, 4, 'Paperback', 'https://m.media-amazon.com/images/I/61-QjYwjyBL.jpg', false)),
-    new Media(new Book('Percy Jackson and the Olympians: The Chalice of the Gods', 'Rick Riordan', 98, 242, 2, 'Hardcover', 'https://m.media-amazon.com/images/I/51pzG0y+ZGL.jpg', false)),
-    new Media(new Book('The Blood of Olympus: The Heroes of Olympus, Book 5', 'Rick Riordan', 3, 544, 3, 'Kindle', 'https://m.media-amazon.com/images/I/61UAso1q57L.jpg', false))
+    new Media(new Book('The Housemaid', ['Fredia McFadden'], 28, 336, 4, 'Paperback', 'https://m.media-amazon.com/images/I/51+UxIo+YNL.jpg', false)),
+    new Media(new Movie('Oppenheimer', ['Christopher Nolan'], '2023/07/21', '3:06', 'https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_.jpg')),
+    new Media(new Book('48 Laws of Power', ['Robert Green'], 16, 480, 4, 'Paperback', 'https://m.media-amazon.com/images/I/31tnyOf+-sL._SY445_SX342_.jpg', false)),
+    new Media(new Book('Holly', ['Stephen King'], 8, 464, 3, 'Hardcover', 'https://m.media-amazon.com/images/I/51J9mQz4SrL.jpg', false)),
+    new Media(new Book('Diary of a Wimpy Kid', ['Jeff Kinney'], 3, 221, 4, 'Paperback', 'https://m.media-amazon.com/images/I/51cNlR3+BEL.jpg', false)),
+    new Media(new Book('The Sword of Summer: Magnus Chase and the Gods of Asgard', ['Rick Riordan'], 5, 531, 4, 'Kindle', 'https://m.media-amazon.com/images/I/615Dt5+caxL.jpg', false)),
+    new Media(new Book('The Outsiders', ['S. E. Hilton'], 14, 192, 4, 'Paperback', 'https://m.media-amazon.com/images/I/41ZUA+0GI8L.jpg', false)),
+    new Media(new Book('Farenheit 451', ['Ray Bradbury'], 7, 272, 4, 'Paperback', 'https://m.media-amazon.com/images/I/41VXKfFmVwL.jpg', false)),
+    new Media(new Book('The Very Hungry Caterpillar', ['Eric Carle'], 23, 32, 4, 'Kindle', 'https://m.media-amazon.com/images/I/51VAbILVUPL.jpg', false)),
+    new Media(new Book('Goodnight Moon', ['Margaret Wise Brown'], 19, 32, 4, 'Hardcover', 'https://m.media-amazon.com/images/I/61BnppyErjL.jpg', false)),
+    new Media(new Book('Happy Birthday to You!', ['Dr. Seuss'], 13, 64, 4, 'Hardcover', 'https://m.media-amazon.com/images/I/51xHgwuohnL._SY445_SX342_.jpg', false)),
+    new Media(new Book('One Fish Two Fish Red Fish Blue Fish', ['Dr. Seuss'], 9, 72, 5, 'Hardcover', 'https://m.media-amazon.com/images/I/51YWnlLkblL._SY445_SX342_.jpg', false)),
+    new Media(new Book('The Lost Hero', ['Rick Riordan'], 187, 592, 3, 'Hardcover', 'https://m.media-amazon.com/images/I/51Esx9gaGiL.jpg', false)),
+    new Media(new Book('The Outsider', ['Stephen King'], 203, 576, 4, 'Paperback', 'https://m.media-amazon.com/images/I/61-QjYwjyBL.jpg', false)),
+    new Media(new Book('Percy Jackson and the Olympians: The Chalice of the Gods', ['Rick Riordan'], 98, 242, 2, 'Hardcover', 'https://m.media-amazon.com/images/I/51pzG0y+ZGL.jpg', false)),
+    new Media(new Book('The Blood of Olympus: The Heroes of Olympus, Book 5', ['Rick Riordan'], 3, 544, 3, 'Kindle', 'https://m.media-amazon.com/images/I/61UAso1q57L.jpg', false))
 ]));
 let newMediaItem = ref(new Media(new Book()));
 let editMediaItem = ref({});
@@ -63,17 +64,21 @@ let visible = ref([ 'title', 'type' ]);
 let selected = ref([]);
 let filters = ref([]);
 let confirmDialog = ref(false);
-let showGridView = ref(false);
 let fullscreen = ref(false);
 let tableFocused = ref(false);
 
-let table = ref(null);
-let addDialog = ref(null);
-let editDialog = ref(null);
-let addMediaForm = ref(null);
-let editMediaForm = ref(null);
+const table = ref(null);
+const addDialog = ref(null);
+const editDialog = ref(null);
+const addMediaForm = ref(null);
+const editMediaForm = ref(null);
+const bookApiDialog = ref(null);
 
-const useDarkTheme = inject('useDarkTheme', false);
+defineProps({
+    tab: {
+        type: String,
+    },
+});
 
 const computedList = computed(() => {
     for (const filter of filters.value) {
@@ -136,7 +141,20 @@ const computedSelectAll = computed({
     }
 });
 
-const emit = defineEmits(['updateShowGridView']);
+const computedISBNArray = computed(() => {
+    const array = [];
+    mediaCollection.forEach((mediaItem) => {
+        if (mediaItem.type === MediaType.Book) {
+            const book = mediaItem.media;
+            if (book && book.isbn) {
+                book.isbn.forEach((isbn) => {
+                    array.push(isbn.identifier);
+                });
+            }
+        }
+    });
+    return array;
+});
 
 function onClickAddBtn(mediaType) {
     switch (mediaType) {
@@ -180,13 +198,15 @@ function onEditDialogSubmit(mediaItem) {
     editMediaItem.value = null;
 }
 
+function onImportBook(item) {
+    const book = Book.ConvertFromGoogleBookAPI(item);
+    const mediaItem = new Media(book);
+    mediaCollection.push(mediaItem);
+}
+
 function deleteSelected() {
     mediaCollection.delete(selected.value);
     selected.value = [];
-}
-
-function setShowGridView(_new) {
-    showGridView.value = _new;
 }
 
 function onToggleFullscreen() {
@@ -245,14 +265,7 @@ function onCardMove(boundingRect, mediaItem) {
 
 /* WATCH */
 
-watch(showGridView, (_new) => {
-   emit('updateShowGridView', _new);
-});
-
-defineExpose({setShowGridView, top});
-
-showGridView.value = $q.screen.lt.md;
-emit('updateShowGridView', showGridView.value);
+defineExpose({top});
 </script>
 
 <template>
@@ -262,7 +275,7 @@ emit('updateShowGridView', showGridView.value);
         @show="addMediaForm.focusForm()"
         @dialog-submit="addMediaForm.submitForm()"
         ref="addDialog">
-        <MediaForm :media="newMediaItem" @onsubmit="onAddDialogSubmit" ref="addMediaForm"></MediaForm>
+        <MediaForm :media-item="newMediaItem" @onsubmit="onAddDialogSubmit" ref="addMediaForm" />
     </EditDialog>
     <EditDialog
         btn-text="Save"
@@ -270,7 +283,7 @@ emit('updateShowGridView', showGridView.value);
         @show="editMediaForm.focusForm()"
         @dialog-submit="editMediaForm.submitForm()"
         ref="editDialog">
-        <MediaForm :media="editMediaItem" @onsubmit="onEditDialogSubmit" ref="editMediaForm"></MediaForm>
+        <MediaForm :media-item="editMediaItem" @onsubmit="onEditDialogSubmit" ref="editMediaForm" />
     </EditDialog>
     <ConfirmationDialog
         confirmation-prompt="Confirm that you want to delete the following items"
@@ -280,14 +293,15 @@ emit('updateShowGridView', showGridView.value);
         ref="confirmDialog">
         <DeleteList :selected="selected" @empty="confirmDialog.closeDialog()"></DeleteList>
     </ConfirmationDialog>
+    <BookAPIDialog :existing-books="computedISBNArray" @import="onImportBook" ref="bookApiDialog" />
     <q-table
         class="q-mx-none"
-        :style="useDarkTheme && !showGridView ? 'border: 1px solid hsla(0,0%,100%,.28)' : null"
+        :style="qDark && tab === 'table' ? 'border: 1px solid hsla(0,0%,100%,.28)' : null"
         :title="tableTitle"
         :rows="computedList"
         row-key="title"
         :columns="columns"
-        :grid="showGridView"
+        :grid="tab === 'grid'"
         :visible-columns="visible"
         separator="cell"
         selection="multiple"
@@ -299,17 +313,18 @@ emit('updateShowGridView', showGridView.value);
         @fullscreen="onToggleFullscreen"
         @keydown.esc="fullscreen = false"
         v-bind="$attrs"
-        :flat="useDarkTheme"
+        :flat="qDark"
         ref="table"
         square>
         <template #top>
             <MediaListHeader :table-title="tableTitle"
-                             :show-grid-view="showGridView"
+                             :show-grid-view="tab === 'grid'"
                              :selected="selected"
                              @click-add="onClickAddBtn"
+                             @click-import="bookApiDialog.show()"
                              @click-delete="onClickDeleteBtn"
                              @toggle-fullscreen="fullscreen = !fullscreen">
-                <q-checkbox class="q-ml-xs" color="grey-8" v-model="computedSelectAll" v-show="showGridView" />
+                <q-checkbox class="q-ml-xs" color="grey-8" v-model="computedSelectAll" v-show="tab === 'grid'" />
             </MediaListHeader>
         </template>
         <template #header-selection>
@@ -336,7 +351,7 @@ emit('updateShowGridView', showGridView.value);
 </template>
 
 <style scoped>
-    .state-btn {
-        width: 125px;
-    }
+.state-btn {
+    width: 125px;
+}
 </style>

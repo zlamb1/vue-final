@@ -9,7 +9,7 @@ export default {
     data() {
         return {
             cols: {
-                author: {type: PopupType.Text, label: 'Author:'},
+                authors: {type: PopupType.Array, label: 'Authors:', options: 'Author'},
                 pagesRead: {type: PopupType.Number, label: 'Pages Read:'},
                 numberOfPages: {type: PopupType.Number, label: 'Number of Pages:'},
                 rating: {type: PopupType.Number, label: 'Rating (/5):'},

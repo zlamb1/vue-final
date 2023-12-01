@@ -1,5 +1,6 @@
 <script setup>
 import Movie from "~/models/Movie";
+import ArrayInput from "~/components/input/ArrayInput.vue";
 
 const {qDark} = useDarkTheme();
 
@@ -18,7 +19,6 @@ const props = defineProps({
     },
 });
 
-const mediaClone = ref(props.media.clone());
 const firstInput = ref(null);
 
 const computedInputColor = computed(() => {
@@ -31,15 +31,7 @@ function focusFirstInput() {
     firstInput.value.focus();
 }
 
-function getMediaClone() {
-    return mediaClone.value;
-}
-
-watch(props.media, async (_new) => {
-    mediaClone.value = _new.clone();
-});
-
-defineExpose({focusFirstInput, getMediaClone});
+defineExpose({focusFirstInput});
 </script>
 
 <template>
@@ -48,29 +40,22 @@ defineExpose({focusFirstInput, getMediaClone});
         label="Title"
         :color="computedInputColor"
         :rules="[value => !!value || 'What is the movie\'s title?']"
-        v-model="mediaClone.title"
+        v-model="media.title"
         ref="firstInput"
         stack-label>
     </q-input>
-    <q-input
-        class="q-py-none"
-        label="Director"
-        :color="computedInputColor"
-        :rules="[value => !!value || 'Who directed the movie?']"
-        v-model="mediaClone.director"
-        stack-label>
-    </q-input>
+    <array-input label="Director" :allow-zero-inputs="true" v-model="media.directors" />
     <q-date
         class="q-my-lg"
         title="Release Date"
-        v-model="mediaClone.releaseDate">
+        v-model="media.releaseDate">
     </q-date>
     <q-input
         class="q-py-none"
         label="Runtime"
         :color="computedInputColor"
         :rules="[value => !!value || 'What was the movie\'s runtime?']"
-        v-model="mediaClone.runTime"
+        v-model="media.runTime"
         stack-label>
     </q-input>
 </template>

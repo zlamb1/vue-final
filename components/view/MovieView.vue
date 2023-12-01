@@ -9,7 +9,7 @@ export default {
     data() {
         return {
             cols: {
-                director: {type: PopupType.Text, label: 'Director:'},
+                directors: {type: PopupType.Array, label: 'Directors:', options: 'Director'},
                 releaseDate: {type: PopupType.Date, label: 'Release Date:', dateFormat: this.media.dateFormatOptions },
                 runTime: {type: PopupType.Text, label: 'Runtime:'},
             }

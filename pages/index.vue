@@ -1,16 +1,13 @@
 <script setup>
 import MediaList from "~/components/list/MediaList.vue";
 
+const $q = useQuasar();
 const {qDark} = useDarkTheme();
 
-const showGridView = ref(false);
+const tab = ref($q.screen.lt.md ? 'grid' : 'table');
 const showBackToTopBtn = ref(false);
 
 let mediaList = ref(null);
-
-function onToggleView() {
-    mediaList.value.setShowGridView(showGridView.value);
-}
 
 function scrollToTop() {
     window.scroll(0, window.scrollY + mediaList.value.top());
@@ -32,24 +29,17 @@ onUnmounted(() => {
 <template>
     <div>
         <div class="row justify-between items-center q-my-lg">
-            <q-btn-toggle
-                class="q-ma-none fit-content"
-                toggle-color="primary"
-                :options="[
-                        {icon: 'o_table_rows', value: false},
-                        {icon: 'o_grid_view', value: true},
-                    ]"
-                v-model="showGridView"
-                @click="onToggleView"
-                spread>
-            </q-btn-toggle>
+            <q-tabs :class="qDark ? 'text-white' : 'text-primary'" v-model="tab">
+                <q-tab name="table" icon="o_table_rows" label="Table" />
+                <q-tab name="grid" icon="o_grid_view" label="Grid" />
+            </q-tabs>
             <q-btn :color="qDark ? 'white' : 'accent'" size="md" icon="public" flat round>
                 <q-tooltip class="bg-accent text-center">
                     Click to view the global media list.
                 </q-tooltip>
             </q-btn>
         </div>
-        <MediaList ref="mediaList"></MediaList>
+        <MediaList :tab="tab" ref="mediaList"></MediaList>
         <div class="full-width row justify-center fixed-top q-ma-lg" style="z-index: 9999;" v-show="showBackToTopBtn">
             <q-btn
                 icon="keyboard_double_arrow_up"

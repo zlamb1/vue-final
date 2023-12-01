@@ -1,5 +1,23 @@
 import {MediaType} from "./Media";
 
+function mapArray(array) {
+    const getSuffix = (length, index) => {
+        let suffix = '';
+        if (index === length - 2) {
+            suffix += ' and '
+        } else if (index !== length - 1) {
+            suffix += ', '
+        }
+        return suffix;
+    }
+    if (array?.length > 1) {
+        return array.map((str, index) => str + getSuffix(array.length, index)).join('');
+    } else if (array?.length > 0) {
+        return array[0];
+    }
+    return '';
+}
+
 export default class Book {
     static CoverType = {
         Paperback: 'Paperback',
@@ -14,16 +32,21 @@ export default class Book {
             return list;
         },
     };
-    constructor(title, author, pagesRead, numberOfPages, rating, coverType, imageUrl, favorite) {
+    
+    static ConvertFromGoogleBookAPI(book) {
+        return new Book();
+    }
+    
+    constructor(title, authors, pagesRead, numberOfPages, rating, coverType, imageUrl, favorite) {
         this.type = MediaType.Book;
-        this.title = title;
-        this.author = author;
-        this.pagesRead = pagesRead;
-        this.numberOfPages = numberOfPages;
-        this.rating = rating;
-        this.coverType = coverType;
-        this.imageUrl = imageUrl;
-        this.favorite = favorite;
+        this.title = title ?? '';
+        this.authors = authors ?? [];
+        this.pagesRead = pagesRead ?? 0;
+        this.numberOfPages = numberOfPages ?? 0;
+        this.rating = rating ?? 1;
+        this.coverType = coverType ?? Book.CoverType.Paperback;
+        this.imageUrl = imageUrl ?? '';
+        this.favorite = favorite ?? false;
     }
     
     get completionPercentage() {
@@ -38,10 +61,14 @@ export default class Book {
     set completionPercentage(value) {
         let newPagesRead = Math.floor((value / 100) * this.numberOfPages);
         if (isNaN(newPagesRead)) {
-            this.pagesRead = 0;
+            this.pagesRead = 1;
         } else {
-            this.pagesRead = newPagesRead;
+            this.pagesRead = Math.max(newPagesRead, 1);
         }
+    }
+    
+    getAuthorsAsString() {
+        return mapArray(this.authors ?? []);
     }
     
     clone() {
@@ -54,3 +81,5 @@ Object.defineProperty(Book.CoverType, 'asArray', { enumerable: false });
 
 // freeze type enum
 Object.freeze(Book.CoverType);
+
+export {mapArray}

@@ -20,6 +20,9 @@ dependencies:
   firebaseui:
     specifier: ^6.1.0
     version: 6.1.0(firebase@10.6.0)
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   nuxt-quasar-ui:
     specifier: ^2.0.6
     version: 2.0.6(@quasar/extras@1.16.8)(quasar@2.14.0)

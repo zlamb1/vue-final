@@ -20,7 +20,7 @@ defineProps({
     },
 });
 
-const emit = defineEmits(['click-add', 'click-delete', 'toggle-fullscreen']);
+const emit = defineEmits(['click-add', 'click-import', 'click-delete', 'toggle-fullscreen']);
 
 function onAddFilter(filterString) {
     filters.value.push(new Filter(filterString));
@@ -52,6 +52,7 @@ function onClickItem(item) {
                 <q-list>
                     <q-item class="text-white text-caption"
                             :class="useDarkTheme ? 'bg-green-8' : 'bg-green-6'"
+                            @click="emit('click-import')"
                             clickable v-close-popup>
                         <q-item-section>
                             <q-item-label>Import</q-item-label>
@@ -61,7 +62,7 @@ function onClickItem(item) {
                             :class="useDarkTheme ? 'bg-green-8' : 'bg-green-6'"
                             v-for="item in MediaType" :key="item"
                             @click="onClickItem(item)"
-                            clickable >
+                            clickable v-close-popup>
                         <q-item-section>
                             <q-item-label>{{item}}</q-item-label>
                         </q-item-section>
@@ -81,7 +82,6 @@ function onClickItem(item) {
                 @click="emit('toggle-fullscreen')" />
         </div>
         <FilterList
-            class="q-mx-md"
             :filters="filters"
             @add-filter="onAddFilter"
             @remove-filter="onRemoveFilter"

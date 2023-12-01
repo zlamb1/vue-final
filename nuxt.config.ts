@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     css: ['~/assets/css/main.css', '~/assets/css/icons.css'],
     quasar: {
         sassVariables: '~/assets/quasar.variables.scss',
-        plugins: ['AppFullscreen', 'Dialog'],
+        plugins: ['AppFullscreen', 'Notify', 'Dialog'],
         iconSet: {
             ...materialIcons, materialIconsOutlined,
             colorPicker: materialIconsRound.colorPicker,

@@ -48,11 +48,12 @@ defineExpose({showDialog, closeDialog});
                        color="primary"
                        class="text-bold btn-action"
                        @click="closeDialog"
-                       flat />
+                       flat v-close-popup />
                 <q-btn :label="btnText"
                        :color="btnColor"
                        class="text-bold btn-action"
-                       @click="onClickConfirm" />
+                       @click="onClickConfirm"
+                       v-close-popup />
             </q-card-actions>
         </q-card>
     </q-dialog>

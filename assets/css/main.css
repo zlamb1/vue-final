@@ -96,3 +96,27 @@
 .fade-leave-to {
     opacity: 0;
 }
+
+.collapse-enter-active, .collapse-leave-active {
+    transition: transform 0.2s ease-in-out;
+    transform-origin: left;
+}
+
+.collapse-enter-from {
+    transform: scaleX(0);
+}
+
+.collapse-leave-to {
+    transform: scaleX(0);
+}
+
+.list-enter-active,
+.list-leave-active {
+    transition: all 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
+}

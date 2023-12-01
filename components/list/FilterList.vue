@@ -1,17 +1,14 @@
 <script setup>
 import {FilterOperator} from "~/models/Filter";
+import {morph} from "quasar";
 
 const {qDark} = useDarkTheme();
 
 const themeColor = ref('blue');
-const showFilterList = ref(true);
-const newFilter = ref('');
+const listExpanded = ref(false);
 
-const container = ref(null);
-const showToggle = ref(null);
-const filterButtons = ref(null);
-const addButton = ref(null);
-const popupEdit = ref(null);
+const menuList = ref(null);
+const expandedList = ref(null);
 
 const props = defineProps({
     filters: {
@@ -20,69 +17,14 @@ const props = defineProps({
     }
 });
 
-const computedColor = computed(() => {
-    return qDark.value ? 'white' : 'primary';
-});
-
 const computedColorValue = computed(() => {
     return qDark.value ? '-8' : '-5';
 });
 
 const emit = defineEmits(['add-filter', 'remove-filter', 'remove-filters']);
 
-async function onToggleShow() {
-    const boundingClientRect = showToggle.value?.$el.getBoundingClientRect();
-    const animDuration = 100;
-    const show = showFilterList.value;
-    const anims = [];
-
-    if (!show) {
-        showFilterList.value = true;
-        await nextTick();
-    }
-
-    const getKeyframes = (b1, b2) => {
-        const translate = b2.left - b1.left;
-        if (show) {
-            return [{transform: `translateX(-${translate}px)`}];
-        } else {
-            return [{transform: `translateX(-${translate}px)`}, {transform: 'translateX(0)'}];
-        }
-    }
-
-    if (filterButtons.value) {
-        for (const filterButton of filterButtons.value) {
-            const anim = filterButton.$el.animate(
-                getKeyframes(boundingClientRect, filterButton.$el.getBoundingClientRect()),
-                {duration: animDuration});
-            anim.pause();
-            anims.push(anim);
-        }
-    }
-
-    const anim = addButton.value?.$el.animate(
-        getKeyframes(boundingClientRect, addButton.value?.$el.getBoundingClientRect()),
-        {duration: animDuration});
-    anim.pause();
-    anims.push(anim)
-
-    for (let i = 0; i < anims.length; i++) {
-        anims[i].play();
-        if (show && i === anims.length - 1) {
-            anims[i].finished.then(() => {
-                showFilterList.value = false;
-            });
-        }
-    }
-}
-
 function onTouchHold() {
-    showToggle.value.$el.classList.add('animate__animated', 'animate__headShake');
-    if (filterButtons.value) {
-        for (let i = 0; i < filterButtons.value.length; i++) {
-            onRemoveFilter(filterButtons.value[i].$el, props.filters[i]);
-        }
-    }
+
 }
 
 function fieldRule(value) {
@@ -112,130 +54,94 @@ function operatorRule(value) {
     return true;
 }
 
-function validateFilter(value) {
-    if (value === '' || value === null || value === undefined) {
-        return false;
-    }
-
-    if (value.charAt(0) === '{' && value.charAt(value.length - 1) !== '}') {
-        return false;
-    }
-
-    if (value.charAt(0) === '{' && !value.includes(':')) {
-        return false;
-    }
-
-    return fieldRule(value) && operatorRule(value);
-}
-
 function onAddFilter(filter) {
-    popupEdit.value.hide();
-    newFilter.value = '';
     emit('add-filter', filter);
 }
 
-function onRemoveFilter(filterElement, filterObject) {
-    filterElement.classList.add('animate__fadeOutDown');
-    filterElement.addEventListener('animationend', () => {
-        emit('remove-filter', filterObject);
-    });
+function onRemoveFilter(filter) {
+    // debounce for ripple animation
+    setTimeout(() => {
+        emit('remove-filter', filter)
+    }, 250);
 }
-
-onMounted(() => {
-    showToggle.value.$el.addEventListener('animationend', () => {
-        showToggle.value.$el.classList.remove('animate__animated', 'animate__headShake')
-    });
-});
 </script>
 
 <template>
-    <div class="row items-center q-gutter-x-sm" ref="container">
-        <q-btn
-            :color="themeColor + computedColorValue"
-            icon="filter_list"
-            size="sm"
-            :outline="!showFilterList"
-            @click="onToggleShow"
-            v-touch-hold:1000.mouse="onTouchHold"
-            ref="showToggle"
-            rounded>
-            <q-tooltip class="text-center" :class="'bg-' + themeColor + '-8'">
-                {{showFilterList ? 'Hide filter list' : 'Show filter list'}}
-                <br />
-                Click and hold for a second to clear filters
-            </q-tooltip>
-        </q-btn>
-        <q-btn
-            class="animate__animated animate__fadeInDown"
-            style="--animate-duration: 0.1s;"
-            size="sm"
-            icon-right="close"
-            :color="themeColor + computedColorValue"
-            :label="filter.toString()"
-            @click="(event) => onRemoveFilter(event.currentTarget, filter)"
-            v-for="filter of filters"
-            :key="filter.toString()"
-            v-show="showFilterList"
-            ref="filterButtons"
-            rounded no-caps>
-            <q-tooltip class="text-center" :class="'bg-' + themeColor + computedColorValue">
-                Filters {{filter.filteredCount}} results
-            </q-tooltip>
-        </q-btn>
-        <q-btn
-            :color="themeColor + computedColorValue"
-            size="sm"
-            icon="add"
-            v-show="showFilterList"
-            ref="addButton"
-            rounded>
-            <q-popup-edit
-                label-set="Add Filter"
-                :cover="false"
-                self="center end"
-                :offset="[10, 0]"
-                v-model="newFilter"
-                v-slot="scope"
-                :validate="validateFilter"
-                :color="computedColor"
-                @update:model-value="onAddFilter"
-                ref="popupEdit"
-                buttons>
-                <q-expansion-item
-                    icon="info"
-                    :header-class="'text-' + themeColor"
-                    class="q-my-sm"
-                    style="width: 300px;"
-                    dense-toggle>
-                    <div class="row no-wrap text-weight-light non-selectable">
-                        <div class="column full-width text-no-wrap">
-                            <span>Format:</span>
-                            <span>Operators:</span>
-                            <span>Example 1:</span>
-                            <span>Example 2</span>
-                        </div>
-                        <div class="column full-width text-no-wrap">
-                            <span>{[field]:[operator][terms]} (optional)</span>
-                            <span>=, &lt;, &gt;, &lt;=, &gt;=</span>
-                            <span>{title:=The Housemaid}</span>
-                            <span>{rating:>=3}</span>
-                        </div>
+    <div class="row items-center q-gutter-x-sm">
+        <transition name="collapse" mode="out-in">
+            <q-btn v-if="!listExpanded"
+                   class="q-ma-none q-pa-sm"
+                   :color="themeColor + computedColorValue"
+                   icon="filter_list"
+                   size="md"
+                   v-touch-hold:1000.mouse="onTouchHold"
+                   ref="menuList"
+                   flat>
+                <span class="on-right">Filter Menu</span>
+                <q-menu class="bg-blue-8"
+                        max-height="30vh"
+                        transition-show="jump-down"
+                        transition-hide="jump-up">
+                    <div class="row justify-center items-center q-pa-md">
+                        <q-input bg-color="white"
+                                 color="accent"
+                                 label="Add Filter"
+                                 @change="onAddFilter"
+                                 filled standout stack-label dense>
+                        </q-input>
+                        <q-btn class="on-right q-pa-sm" icon="open_in_full" color="white" size="sm" @click="listExpanded = true" flat />
                     </div>
-                </q-expansion-item>
-                <q-input
-                    label="Filter"
-                    :color="computedColor"
-                    :rules="[
-                      value => !!value || 'Filter cannot be empty',
-                      value => !(value.charAt(0) === '{' && value.charAt(value.length - 1) !== '}') || 'Filter missing closing symbol \'}\'',
-                      value => !(value.charAt(0) === '{' && !value.includes(':')) || 'Filter is missing \':\' separator',
-                      fieldRule, operatorRule
-                  ]"
-                    v-model="scope.value"
-                    @keydown.enter="$refs.popupEdit.set()"
-                    autofocus dense stack-label>
-                </q-input>
-            </q-popup-edit>
-        </q-btn>
+                    <q-separator v-show="filters.length > 0" color="white" />
+                    <q-list>
+                        <q-item v-for="filter of filters"
+                                @click="onRemoveFilter(filter)"
+                                clickable v-ripple:red>
+                            <q-item-section :class="listExpanded ? 'text-black' : 'text-white'">
+                                <q-item-label>{{filter.toString()}}</q-item-label>
+                                <q-item-label v-if="filter.filteredCount > 0"
+                                              class="filter-caption"
+                                              caption>
+                                    Filtered {{filter.filteredCount.toString()}} results
+                                </q-item-label>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-menu>
+            </q-btn>
+            <div v-else class="row">
+                <q-btn icon="filter_list" :color="themeColor + computedColorValue" @click="listExpanded = false" flat>
+                    <q-tooltip class="bg-accent">
+                        Click to collapse
+                    </q-tooltip>
+                </q-btn>
+                <q-list class="row">
+                    <q-item v-for="filter of filters"
+                            @click="console.log('click')"
+                            clickable v-ripple:red>
+                        <q-item-section :class="listExpanded ? 'text-' + themeColor + computedColorValue : 'text-white'">
+                            <q-item-label>{{filter.toString()}}</q-item-label>
+                            <q-item-label v-if="filter.filteredCount > 0"
+                                          class="filter-caption"
+                                          caption>
+                                Filtered {{filter.filteredCount.toString()}} results
+                            </q-item-label>
+                        </q-item-section>
+                    </q-item>
+                </q-list>
+            </div>
+        </transition>
     </div>
 </template>
+
+<style scoped>
+.filter-caption {
+    color: rgba(255, 255, 255, 0.9)
+}
+.disappear-text {
+    transform-origin: left;
+    transition: transform 0.2s ease;
+}
+.q-btn:hover .disappear-text {
+    transform: scaleX(0);
+}
+</style>

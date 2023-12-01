@@ -1,13 +1,14 @@
 import {MediaType} from "./Media";
 
 export default class Movie {
-    constructor(title, director, releaseDate, runTime, imageUrl) {
+    constructor(title, directors, releaseDate, runTime, imageUrl, favorite) {
         this.type = MediaType.Movie;
-        this.title = title;
-        this.director = director;
-        this.releaseDate = releaseDate;
-        this.runTime = runTime;
-        this.imageUrl = imageUrl;
+        this.title = title ?? '';
+        this.directors = directors ?? [];
+        this.releaseDate = releaseDate ?? Date.now();
+        this.runTime = runTime ?? '0:00';
+        this.imageUrl = imageUrl ?? '';
+        this.favorite = favorite ?? false;
     }
     
     get dateFormatOptions() {
