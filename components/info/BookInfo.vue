@@ -33,7 +33,7 @@ defineProps({
                     no-reset>
                 </q-rating>
             </div>
-            <div v-if="media.pagesRead && media.numberOfPages">
+            <div v-if="media.pagesRead && media.pageCount">
                 <BookKnob :book="media"></BookKnob>
             </div>
         </div>

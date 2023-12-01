@@ -11,7 +11,7 @@ export default {
             cols: {
                 authors: {type: PopupType.Array, label: 'Authors:', options: 'Author', formatter: mapArray},
                 pagesRead: {type: PopupType.Number, label: 'Pages Read:'},
-                numberOfPages: {type: PopupType.Number, label: 'Number of Pages:'},
+                pageCount: {type: PopupType.Number, label: 'Page Count:'},
                 rating: {type: PopupType.Number, label: 'Rating (/5):'},
                 coverType: {type: PopupType.Select, label: 'Cover Type:', options: Book.CoverType.asArray()}
             }

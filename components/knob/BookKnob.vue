@@ -72,7 +72,7 @@ defineEmits(['update:model-value'])
         <q-knob
             :min="0"
             :max="100"
-            :step="100 / book.numberOfPages"
+            :step="100 / book.pageCount"
             :size="size"
             :thickness="thickness"
             :color="color"

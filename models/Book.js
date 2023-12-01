@@ -43,12 +43,12 @@ export default class Book {
         return newBook;
     }
     
-    constructor(title, authors, pagesRead, numberOfPages, rating, coverType, imageUrl, favorite) {
+    constructor(title, authors, pagesRead, pageCount, rating, coverType, imageUrl, favorite) {
         this.type = MediaType.Book;
         this.title = title ?? '';
         this.authors = authors ?? [];
         this.pagesRead = pagesRead ?? 0;
-        this.numberOfPages = numberOfPages ?? 0;
+        this.pageCount = pageCount ?? 0;
         this.rating = rating ?? 1;
         this.coverType = coverType ?? Book.CoverType.Paperback;
         this.imageUrl = imageUrl ?? '';
@@ -56,7 +56,7 @@ export default class Book {
     }
     
     get completionPercentage() {
-        const percentage = this.pagesRead / this.numberOfPages * 100;
+        const percentage = this.pagesRead / this.pageCount * 100;
         if (isNaN(percentage)) {
             return 0;
         }
@@ -65,7 +65,7 @@ export default class Book {
     }
     
     set completionPercentage(value) {
-        let newPagesRead = Math.floor((value / 100) * this.numberOfPages);
+        const newPagesRead = Math.floor((value / 100) * this.pageCount);
         if (isNaN(newPagesRead)) {
             this.pagesRead = 1;
         } else {

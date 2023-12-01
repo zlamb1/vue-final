@@ -60,7 +60,7 @@ defineExpose({focusFirstInput});
         label="Number of Pages"
         :color="computedInputColor"
         :rules="[value => !!value.toString() || 'What is the page count of the book?']"
-        v-model.number="media.numberOfPages"
+        v-model.number="media.pageCount"
         stack-label>
     </q-input>
     <q-input
