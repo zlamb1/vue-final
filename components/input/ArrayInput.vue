@@ -87,7 +87,7 @@ onMounted(() => {
                  @update:model-value="onUpdate"
                  filled stack-label />
         <div class="q-ml-auto">
-            <q-btn :class="verticalOverflow ? 'q-mx-md' : null" style="aspect-ratio: 1;" color="red" icon="remove" @click="onRemove(index)" outline />
+            <q-btn class="q-ml-md" :class="verticalOverflow ? 'q-mr-md' : null" style="aspect-ratio: 1;" color="red" icon="remove" @click="onRemove(index)" outline />
         </div>
     </div>
     <q-btn icon="add" color="green" @click="onAdd">
