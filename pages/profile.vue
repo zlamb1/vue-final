@@ -5,6 +5,7 @@ import DynamicPopupEdit from "~/components/popup-edit/DynamicPopupEdit.vue";
 import UserErrorCard from "~/components/card/UserErrorCard.vue";
 import ResponseCode from "~/models/ResponseCode";
 import RouterBackButton from "~/components/button/RouterBackButton.vue";
+import APIEndpoints from "~/models/Endpoints";
 
 definePageMeta({
    middleware: 'auth'
@@ -28,13 +29,6 @@ if (user.signedIn) {
 
 const saveChanges = async () => {
     const notifyDuration = 1000;
-    const userToken = await useUserToken();
-
-    let apiUrl = `/api/update-user?idToken=${userToken}`;
-    apiUrl += `&displayName=${displayName.value}`;
-    apiUrl += `&photoURL=${photoURL.value}`;
-    apiUrl += `&bio=${bio.value}`;
-
     const notify = (msg, negative) => {
         $q.notify({
             type: negative ? 'negative' : 'positive',
@@ -45,24 +39,32 @@ const saveChanges = async () => {
         });
     }
 
-    await fetch(apiUrl).then(async (response) => {
-        const responseCode = ResponseCode.toResponseCode(await response.text());
-        switch (responseCode) {
-            case ResponseCode.SUCCESS:
-                notify();
-                break;
-            case ResponseCode.NO_USER:
-                notify('No user was found', true);
-                break;
-            case ResponseCode.NO_CHANGE:
-                notify('No changes', true);
-                break;
-            default:
-            case ResponseCode.UNKNOWN:
-                notify('', true);
-                break;
+    const idToken = await useUserToken();
+    const response = await useFetch(APIEndpoints.UPDATE_USER, {
+        query: {
+            idToken: idToken,
+            displayName: displayName.value,
+            photoURL: photoURL.value,
+            bio: bio.value,
         }
     });
+
+    const responseCode = ResponseCode.toResponseCode(response.data.value);
+    switch (responseCode) {
+        case ResponseCode.SUCCESS:
+            notify();
+            break;
+        case ResponseCode.NO_USER:
+            notify('No user was found', true);
+            break;
+        case ResponseCode.NO_CHANGE:
+            notify('No changes', true);
+            break;
+        default:
+        case ResponseCode.UNKNOWN:
+            notify('', true);
+            break;
+    }
 }
 
 watch(user, (newUser) => {
