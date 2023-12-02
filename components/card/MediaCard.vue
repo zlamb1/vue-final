@@ -139,7 +139,7 @@ onMounted(() => {
                         class="rounded-borders"
                         fit="cover"
                         :src="media.media.imageUrl"
-                        placeholder-src="../../assets/placeholder_cover.png"
+                        placeholder-src="~/assets/placeholder_cover.png"
                         :ratio="9/10"
                         eager no-transition>
                     </q-img>

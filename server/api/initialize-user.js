@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
                 if (doc.exists) {
                     return ResponseCode.USER_EXISTS;
                 }
+                // initialize user data
                 await docRef.set({
                     displayName: user.name,
                     photoURL: user.picture,
@@ -19,9 +20,15 @@ export default defineEventHandler(async (event) => {
                         user: true
                     }
                 });
+                // initialize list data
+                const listDocRef = firestore.doc(`lists/${user.uid}`);
+                await listDocRef.set({
+                   list: [],
+                });
+                // initialize role data
                 const rolesDocRef = firestore.doc('roles/user');
                 await rolesDocRef.update('members', FieldValue.arrayUnion(user.uid));
-                return ResponseCode.SUCCESS
+                return ResponseCode.SUCCESS;
             })
             .catch((err) => {
                 // log to server

@@ -2,14 +2,18 @@ import {onAuthStateChanged, reauthenticateWithPopup, GoogleAuthProvider} from 'f
 import {doc, onSnapshot} from "firebase/firestore";
 import APIEndpoints from "~/models/Endpoints";
 
-function useUser() {
+function useUser(callback = (user) => {}) {
     const db = useFirestore();
     const auth = useFirebaseAuth();
+    const currentUser = useCurrentUser();
     
     const user = reactive({
         loading: true,
         signedIn: false,
-        data: {}
+        data: {
+        
+        },
+        uid: null,
     });
     
     let unsub = () => {}
@@ -26,6 +30,7 @@ function useUser() {
         
         user.signedIn = false;
         if (newUser) {
+            user.uid = newUser.uid;
             unsub = onSnapshot(doc(db, 'users', newUser.uid), (doc) => {
                 user.data = doc.data();
                 // only 'sign-in' user once data has been received
@@ -34,6 +39,11 @@ function useUser() {
         } else {
             // no user
             user.data = null;
+            user.uid = null;
+        }
+        
+        if (callback) {
+            callback(user);
         }
     });
     

@@ -1,14 +1,10 @@
-const MediaType = {
+const MediaType = Object.freeze(Object.defineProperty({
     Book: 'Book',
     Movie: 'Movie',
-};
-
-Object.defineProperty(MediaType, 'Default', {
-    value: MediaType.Book,
+    Default: 'Book',
+}, 'Default', {
     enumerable: false,
-})
-
-Object.freeze(MediaType);
+}));
 
 class Media {
     constructor(media) {

@@ -8,36 +8,21 @@ import MediaListHeader from "~/components/list/MediaListHeader.vue";
 import Book from "~/models/Book";
 import {Media, MediaType} from "~/models/Media";
 import Movie from "~/models/Movie";
-import MediaCollection from "~/models/MediaCollection";
 import MediaRow from "~/components/list/MediaRow.vue";
 import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
 
 const {qDark} = useDarkTheme();
 
-const mediaCollection = reactive(new MediaCollection([
-    new Media(new Book('The Housemaid', ['Fredia McFadden'], 28, 336, 4, 'Paperback', 'https://m.media-amazon.com/images/I/51+UxIo+YNL.jpg', false)),
-    new Media(new Movie('Oppenheimer', ['Christopher Nolan'], '2023/07/21', '3:06', 'https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_.jpg')),
-    new Media(new Book('48 Laws of Power', ['Robert Green'], 16, 480, 4, 'Paperback', 'https://m.media-amazon.com/images/I/31tnyOf+-sL._SY445_SX342_.jpg', false)),
-    new Media(new Book('Holly', ['Stephen King'], 8, 464, 3, 'Hardcover', 'https://m.media-amazon.com/images/I/51J9mQz4SrL.jpg', false)),
-    new Media(new Book('Diary of a Wimpy Kid', ['Jeff Kinney'], 3, 221, 4, 'Paperback', 'https://m.media-amazon.com/images/I/51cNlR3+BEL.jpg', false)),
-    new Media(new Book('The Sword of Summer: Magnus Chase and the Gods of Asgard', ['Rick Riordan'], 5, 531, 4, 'Kindle', 'https://m.media-amazon.com/images/I/615Dt5+caxL.jpg', false)),
-    new Media(new Book('The Outsiders', ['S. E. Hilton'], 14, 192, 4, 'Paperback', 'https://m.media-amazon.com/images/I/41ZUA+0GI8L.jpg', false)),
-    new Media(new Book('Farenheit 451', ['Ray Bradbury'], 7, 272, 4, 'Paperback', 'https://m.media-amazon.com/images/I/41VXKfFmVwL.jpg', false)),
-    new Media(new Book('The Very Hungry Caterpillar', ['Eric Carle'], 23, 32, 4, 'Kindle', 'https://m.media-amazon.com/images/I/51VAbILVUPL.jpg', false)),
-    new Media(new Book('Goodnight Moon', ['Margaret Wise Brown'], 19, 32, 4, 'Hardcover', 'https://m.media-amazon.com/images/I/61BnppyErjL.jpg', false)),
-    new Media(new Book('Happy Birthday to You!', ['Dr. Seuss'], 13, 64, 4, 'Hardcover', 'https://m.media-amazon.com/images/I/51xHgwuohnL._SY445_SX342_.jpg', false)),
-    new Media(new Book('One Fish Two Fish Red Fish Blue Fish', ['Dr. Seuss'], 9, 72, 5, 'Hardcover', 'https://m.media-amazon.com/images/I/51YWnlLkblL._SY445_SX342_.jpg', false)),
-    new Media(new Book('The Lost Hero', ['Rick Riordan'], 187, 592, 3, 'Hardcover', 'https://m.media-amazon.com/images/I/51Esx9gaGiL.jpg', false)),
-    new Media(new Book('The Outsider', ['Stephen King'], 203, 576, 4, 'Paperback', 'https://m.media-amazon.com/images/I/61-QjYwjyBL.jpg', false)),
-    new Media(new Book('Percy Jackson and the Olympians: The Chalice of the Gods', ['Rick Riordan'], 98, 242, 2, 'Hardcover', 'https://m.media-amazon.com/images/I/51pzG0y+ZGL.jpg', false)),
-    new Media(new Book('The Blood of Olympus: The Heroes of Olympus, Book 5', ['Rick Riordan'], 3, 544, 3, 'Kindle', 'https://m.media-amazon.com/images/I/61UAso1q57L.jpg', false))
-]));
-let newMediaItem = ref(new Media(new Book()));
-let editMediaItem = ref({});
-let moveMediaItem = ref(null);
-let tableTitle = ref('The Media List');
+const {mediaCollection} = useMediaList();
 
-let columns = ref([
+// const mediaCollection = reactive(MediaCollection([]));
+
+const newMediaItem = ref(new Media(new Book()));
+const editMediaItem = ref({});
+const moveMediaItem = ref(null);
+const tableTitle = ref('The Media List');
+
+const columns = ref([
     {
         name: 'media',
         field: 'media'
@@ -60,12 +45,12 @@ let columns = ref([
     },
 ]);
 
-let visible = ref([ 'title', 'type' ]);
-let selected = ref([]);
-let filters = ref([]);
-let confirmDialog = ref(false);
-let fullscreen = ref(false);
-let tableFocused = ref(false);
+const visible = ref([ 'title', 'type' ]);
+const selected = ref([]);
+const filters = ref([]);
+const confirmDialog = ref(false);
+const fullscreen = ref(false);
+const tableFocused = ref(false);
 
 const table = ref(null);
 const addDialog = ref(null);
@@ -270,8 +255,6 @@ function onCardMove(boundingRect, mediaItem) {
         mediaCollection.swapItems(mediaItem, swapMediaItem)
     }
 }
-
-/* WATCH */
 
 defineExpose({top});
 </script>

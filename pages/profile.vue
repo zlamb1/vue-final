@@ -108,7 +108,7 @@ watch(user, (newUser) => {
                     </q-card-section>
                 </q-card>
                 <div class="full-width" v-else>
-                    <UserErrorCard class="full-width" height="200" />
+                    <UserErrorCard class="full-width" :height="200" />
                 </div>
             </div>
         </div>
