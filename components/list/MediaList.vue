@@ -10,12 +10,11 @@ import {Media, MediaType} from "~/models/Media";
 import Movie from "~/models/Movie";
 import MediaRow from "~/components/list/MediaRow.vue";
 import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
+import ResponseCode from "~/models/ResponseCode";
 
 const {qDark} = useDarkTheme();
 
-const {mediaCollection} = useMediaList();
-
-// const mediaCollection = reactive(MediaCollection([]));
+const {mediaCollection} = useMediaCollection();
 
 const newMediaItem = ref(new Media(new Book()));
 const editMediaItem = ref({});
@@ -160,7 +159,7 @@ function onClickDeleteBtn() {
 }
 
 function onAddDialogSubmit(mediaItem) {
-    mediaCollection.push(mediaItem);
+    mediaCollection.dbAdd(mediaItem);
     addDialog.value.hideDialog();
 }
 
@@ -184,7 +183,7 @@ function onEditDialogSubmit(mediaItem) {
 function onImportBook(item) {
     const book = Book.ConvertFromGoogleBookAPI(item);
     const mediaItem = new Media(book);
-    mediaCollection.push(mediaItem);
+    mediaCollection.dbAdd(mediaItem);
 }
 
 function onRemoveImport(book) {

@@ -1,10 +1,11 @@
-import {QueryDocumentSnapshot} from "firebase/firestore";
 import type {SnapshotOptions} from 'firebase/firestore';
-import {collection, doc, onSnapshot} from "firebase/firestore";
+import {collection, doc, onSnapshot, QueryDocumentSnapshot} from "firebase/firestore";
 import {Media, MediaType} from "~/models/Media";
 import Book from "~/models/Book";
 import Movie from "~/models/Movie";
 import MediaCollection from "~/models/MediaCollection";
+import APIEndpoints from "~/models/Endpoints";
+import UpdateAction from "~/models/UpdateAction";
 
 const mediaConverter = {
     toFirestore(collection: Media[]) : Object {
@@ -40,18 +41,30 @@ const mediaConverter = {
     }
 }
 
-export default function useMediaList() {
+export default function useMediaCollection() {
     const mediaCollection = reactive(MediaCollection([]));
     
     const db = useFirestore();
     let unsubscribe = () => {}
 
+    mediaCollection.dbAdd = async (media: Media) => {
+        const idToken = await useUserToken();
+        const response = await useFetch(APIEndpoints.UPDATE_LIST, {
+            query: {
+                idToken: idToken,
+                updateAction: UpdateAction.ADD,
+                updateObject: JSON.stringify(media.media),
+            }
+        });
+        return response.data;
+    };
+
     useUser((user) => {
         unsubscribe();
-        mediaCollection.length = 0;
         if (user.uid) {
             const docRef = doc(collection(db, 'lists'), user.uid).withConverter(mediaConverter);
             unsubscribe = onSnapshot(docRef, (doc) => {
+                mediaCollection.length = 0;
                 const collection = doc.data();
                 if (collection) {
                     for (const media of collection) {
