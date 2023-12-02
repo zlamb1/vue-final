@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
         }
         
         const listCopy = [...listDoc.data().list];
-        const parsedObject = JSON.parse(updateObject);
+        const parsedObject = JSON.parse(updateObject ?? '{}');
         
         const arrayIndex = parseInt(targetIndex);
         if (updateAction !== UpdateAction.ADD && (arrayIndex < 0 || arrayIndex >= listCopy.length)) {
@@ -48,7 +48,8 @@ export default defineEventHandler(async (event) => {
         }
         
         return ResponseCode.SUCCESS;
-    }).catch(() => {
+    }).catch((err) => {
+        console.log(err);
         return ResponseCode.UNKNOWN;
     });
 });

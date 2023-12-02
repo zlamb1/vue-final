@@ -190,15 +190,17 @@ function onRemoveImport(book) {
     for (let i = 0; i < mediaCollection.length; i++) {
         const mediaItem = mediaCollection[i];
         if (mediaItem.media === book) {
-            mediaCollection.splice(i, 1);
+            mediaCollection.dbRemoveByIndex(i);
             break;
         }
     }
 }
 
-function deleteSelected() {
-    mediaCollection.delete(selected.value);
-    selected.value = [];
+async function deleteSelected() {
+    for (const media of selected.value) {
+        console.log(await mediaCollection.dbRemove(media));
+    }
+    //selected.value = [];
 }
 
 function onToggleFullscreen() {
