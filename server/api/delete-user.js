@@ -5,23 +5,20 @@ import ResponseCode from "~/models/ResponseCode";
 export default defineEventHandler(async (event) => {
     return await useUserToken(event).then((user) => {
         const uid = user.uid;
-        const publicDocRef = firestore.doc(`users/public/${uid}`);
-        const privateDocRef = firestore.doc(`users/private/${uid}`);
+        const publicDocRef = firestore.doc(`users/${uid}`);
+        const privateDocRef = firestore.doc(`users/${uid}/private/data`);
         return publicDocRef.get()
             .then(async (doc) => {
                 if (!doc.exists) {
                     return ResponseCode.NO_USER;
                 }
-                // delete roles
-                const roles = doc.data().roles;
-                for (const role in roles) {
-                    const roleDocRef =
-                        firestore.doc(`roles/${role}`);
-                    await roleDocRef.update('members', FieldValue.arrayRemove(uid));
-                }
-                // delete list
+                // delete list + refs
                 const listDocRef = firestore.doc(`lists/${uid}`);
                 await listDocRef.delete();
+                const publicDocRef = firestore.doc('lists/public');
+                await publicDocRef.update({
+                    users: FieldValue.arrayRemove(uid),
+                })
                 // delete user docs
                 await publicDocRef.delete();
                 await privateDocRef.delete();

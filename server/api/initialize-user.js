@@ -24,11 +24,9 @@ export default defineEventHandler(async (event) => {
         });
         const listDocRef = firestore.doc(`lists/${user.uid}`);
         await listDocRef.set({
-            public: false,
             list: {},
+            visibility: 'private',
         });
-        const rolesDocRef = firestore.doc('roles/user');
-        await rolesDocRef.update('members', FieldValue.arrayUnion(user.uid));
         return ResponseCode.SUCCESS;
     }).catch((err) => {
         console.log('Error creating new user: ' + err);

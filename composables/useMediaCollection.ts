@@ -6,6 +6,7 @@ import Movie from "~/models/Movie";
 import MediaCollection from "~/models/MediaCollection";
 import APIEndpoints from "~/models/Endpoints";
 import UpdateAction from "~/models/UpdateAction";
+import {FirebaseError} from "@firebase/app";
 
 const mediaConverter = {
     toFirestore(collection: Media[]) : Object {
@@ -42,7 +43,7 @@ const mediaConverter = {
     }
 }
 
-export default function useMediaCollection() {
+export default function useMediaCollection(userId, onError = (err) => {}) {
     const mediaCollection = reactive(MediaCollection([]));
     
     const db = useFirestore();
@@ -74,21 +75,28 @@ export default function useMediaCollection() {
         return response.data.value;
     }
 
-    useUser((user) => {
-        unsubscribe();
-        if (user.uid) {
-            const docRef = doc(collection(db, 'lists'), user.uid).withConverter(mediaConverter);
-            unsubscribe = onSnapshot(docRef, (doc) => {
-                mediaCollection.length = 0;
-                const collection = doc.data();
-                if (collection) {
-                    for (const media of collection) {
-                        mediaCollection.push(media);
-                    }
-                }
-            });
+    const onDocUpdate = (doc) => {
+        mediaCollection.length = 0;
+        const collection = doc.data();
+        if (collection) {
+            for (const media of collection) {
+                mediaCollection.push(media);
+            }
         }
-    });
+    }
+
+    if (userId) {
+        const docRef = doc(collection(db, 'lists'), userId).withConverter(mediaConverter);
+        unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
+    } else {
+        useUser((user) => {
+            unsubscribe();
+            if (user.uid) {
+                const docRef = doc(collection(db, 'lists'), user.uid).withConverter(mediaConverter);
+                unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
+            }
+        });
+    }
     
     return {mediaCollection};
 }

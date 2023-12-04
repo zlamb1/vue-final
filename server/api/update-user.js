@@ -1,9 +1,30 @@
 import {firestore, useUserToken} from "~/server/api/_firebase";
 import ResponseCode from "~/models/ResponseCode";
+import {FieldValue} from "firebase-admin/firestore";
+
+function parseVisibility(visibility) {
+    switch (visibility?.toLowerCase()) {
+        case 'public':
+            return true;
+        default:
+            return false;
+    }
+}
+
+async function updateListVisibility(uid, listVisibility) {
+    const listDocRef = firestore.doc(`lists/${uid}`);
+    await listDocRef.update({
+        visibility: listVisibility,
+    });
+    const publicDocRef = firestore.doc('lists/public');
+    await publicDocRef.update({
+        users: parseVisibility(listVisibility) ? FieldValue.arrayUnion(uid) : FieldValue.arrayRemove(uid),
+    });
+}
 
 export default defineEventHandler(async (event) => {
     return await useUserToken(event).then(async (user) => {
-        const {displayName, photoURL, bio, profilePrivate, targetUser} = getQuery(event);
+        const {displayName, photoURL, bio, profileVisibility, listVisibility, targetUser} = getQuery(event);
         
         if (targetUser) {
             // TODO: validate permissions and update target profile
@@ -18,25 +39,38 @@ export default defineEventHandler(async (event) => {
             return ResponseCode.NO_USER;
         }
         
-        const updateData = {};
-        
-        // displayName is required
-        if (displayName) {
-            updateData.displayName = displayName;
+        if (listVisibility) {
+            await updateListVisibility(user.uid, listVisibility);
         }
         
-        if (photoURL) {
-            updateData.photoURL = photoURL;
+        {
+            const update = {};
+            if (displayName) {
+                update.displayName = displayName;
+            }
+            
+            if (photoURL) {
+                update.photoURL = photoURL;
+            }
+            
+            if (Object.keys(update).length > 0) {
+                await publicDocRef.update(update);
+            }
         }
         
-        if (bio) {
-            await privateDocRef.update({
-                bio: bio,
-            });
-        }
-        
-        if (Object.keys(updateData).length > 0) {
-            await publicDocRef.update(updateData);
+        {
+            const update = {};
+            if (bio) {
+                update.bio = bio;
+            }
+            
+            if (profileVisibility) {
+                update.visibility = profileVisibility;
+            }
+            
+            if (Object.keys(update).length > 0) {
+                await privateDocRef.update(update);
+            }
         }
         
         return ResponseCode.SUCCESS;

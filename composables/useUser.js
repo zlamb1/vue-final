@@ -14,8 +14,10 @@ function useUser(callback = (user) => {}) {
         uid: null,
     });
     
-    let unsub = () => {}
-    let unsub2 = () => {}
+    let unsubPublic = () => {}
+    let unsubPrivate = () => {}
+    let unsubList = () => {}
+    
     onAuthStateChanged(auth, (newUser) => {
         if (user.loading) {
             setTimeout(() => {
@@ -23,23 +25,23 @@ function useUser(callback = (user) => {}) {
             }, 500);
         }
         
-        if (unsub) {
-            unsub();
-        }
-        if (unsub2) {
-            unsub2();
-        }
+        unsubPublic();
+        unsubPrivate();
+        unsubList();
         
         user.signedIn = false;
         if (newUser) {
             user.uid = newUser.uid;
-            unsub = onSnapshot(doc(db, 'users', newUser.uid), (doc) => {
+            unsubPublic = onSnapshot(doc(db, 'users', newUser.uid), (doc) => {
                 user.public = doc.data();
                 // only 'sign-in' user once data has been received
                 user.signedIn = true;
             });
-            unsub2 = onSnapshot(doc(db, `users/${newUser.uid}/private/data`), (doc) => {
+            unsubPrivate = onSnapshot(doc(db, `users/${newUser.uid}/private/data`), (doc) => {
                 user.private = doc.data();
+            });
+            unsubList = onSnapshot(doc(db, `lists/${newUser.uid}`), (doc) => {
+                user.list = doc.data();
             });
         } else {
             // no user

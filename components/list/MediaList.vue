@@ -10,11 +10,9 @@ import {Media, MediaType} from "~/models/Media";
 import Movie from "~/models/Movie";
 import MediaRow from "~/components/list/MediaRow.vue";
 import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
-import ResponseCode from "~/models/ResponseCode";
+import UserErrorCard from "~/components/card/UserErrorCard.vue";
 
 const {qDark} = useDarkTheme();
-
-const {mediaCollection} = useMediaCollection();
 
 const newMediaItem = ref(new Media(new Book()));
 const editMediaItem = ref({});
@@ -58,11 +56,24 @@ const addMediaForm = ref(null);
 const editMediaForm = ref(null);
 const bookApiDialog = ref(null);
 
-defineProps({
+const missingPermissions = ref(false);
+
+const props = defineProps({
     tab: {
         type: String,
     },
+    id: {
+        type: String,
+    }
 });
+
+const emit = defineEmits(['error']);
+
+const onError = (err) => {
+    emit('error', err);
+}
+
+const {mediaCollection} = useMediaCollection(props.id, onError);
 
 const computedList = computed(() => {
     for (const filter of filters.value) {

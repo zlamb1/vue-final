@@ -13,13 +13,13 @@ const router = useRouter();
 const user = useUser();
 const {qDark} = useDarkTheme();
 
-const profilePrivate = ref(false);
-const mediaListPrivate = ref(true);
+const profileVisibility = ref(user.private?.visibility);
+const listVisibility = ref(user.list?.visibility);
 const deleteInputText = ref('');
 const deleteConfirmed = ref(false);
 
 const text = computed(() => {
-    return user.data?.displayName;
+    return user.public?.displayName;
 });
 
 const shadowText = computed(() => {
@@ -33,10 +33,23 @@ const shadowText = computed(() => {
 });
 
 const {notifyPositive, notifyNegative} = useNotify();
-async function onCheckProfilePrivate(newValue) {
+async function updateProfileVisibility() {
     const idToken = await useUserToken();
     const {data} = await useFetch(APIEndpoints.UPDATE_USER, {
-       query: {idToken, profilePrivate: newValue}
+       query: {idToken, profileVisibility: profileVisibility.value}
+    });
+    const responseCode = ResponseCode.toResponseCode(data.value);
+    if (responseCode === ResponseCode.SUCCESS) {
+        notifyPositive();
+    } else {
+        notifyNegative();
+    }
+}
+
+async function updateListVisibility() {
+    const idToken = await useUserToken();
+    const {data} = await useFetch(APIEndpoints.UPDATE_USER, {
+        query: {idToken, listVisibility: listVisibility.value}
     });
     const responseCode = ResponseCode.toResponseCode(data.value);
     if (responseCode === ResponseCode.SUCCESS) {
@@ -80,7 +93,8 @@ async function onDeleteUser() {
 
 watch(user, (newUser) => {
     if (newUser.signedIn) {
-        profilePrivate.value = Boolean(JSON.parse(newUser.data?.profilePrivate));
+        profileVisibility.value = newUser.private?.visibility;
+        listVisibility.value = newUser.list?.visibility;
     }
 });
 </script>
@@ -95,18 +109,20 @@ watch(user, (newUser) => {
                 </q-card-section>
                 <q-separator />
                 <q-card-section class="column q-gutter-md">
-                    <q-list>
-                        <q-item tag="label" v-ripple>
-                            <q-item-section avatar>
-                                <q-checkbox v-model="profilePrivate" @update:model-value="onCheckProfilePrivate" color="accent" label="Make Profile Private" />
-                            </q-item-section>
-                        </q-item>
-                        <q-item tag="label" v-ripple>
-                            <q-item-section avatar>
-                                <q-checkbox v-model="mediaListPrivate" color="accent" label="Make Media List Private" />
-                            </q-item-section>
-                        </q-item>
+                    <q-list class="column text-center q-gutter-y-md">
+                        <span style="font-size: 16px;">Profile Visibility</span>
+                        <q-tabs :class="qDark ? 'text-white' : 'text-primary'" v-model="profileVisibility" @update:model-value="updateProfileVisibility">
+                            <q-tab name="private" icon="lock" label="Private" />
+                            <q-tab name="public" icon="public" label="Public" />
+                        </q-tabs>
+                        <q-separator />
+                        <span style="font-size: 16px;">Media List Visibility</span>
+                        <q-tabs :class="qDark ? 'text-white' : 'text-primary'" v-model="listVisibility" @update:model-value="updateListVisibility">
+                            <q-tab name="private" icon="lock" label="Private" />
+                            <q-tab name="public" icon="public" label="Public" />
+                        </q-tabs>
                     </q-list>
+                    <q-separator />
                     <div class="row q-gutter-x-md delete-section">
                         <q-input :shadow-text="shadowText"
                                  @update:model-value="modelValueUpdate"

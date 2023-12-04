@@ -10,6 +10,8 @@ initializeApp({
 });
 
 const firestore = admin.firestore();
+firestore.settings({ ignoreUndefinedProperties: true })
+
 const auth = admin.auth();
 
 const useUserToken = async (event) => {

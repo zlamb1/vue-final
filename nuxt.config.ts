@@ -4,6 +4,9 @@ import materialIconsOutlined from 'quasar/icon-set/material-icons-outlined';
 import materialIconsRound from 'quasar/icon-set/svg-material-icons-round'
 
 export default defineNuxtConfig({
+    app: {
+        pageTransition: { name: 'fade', mode: 'out-in' }
+    },
     ssr: false,
     modules: ['nuxt-quasar-ui', 'nuxt-vuefire'],
     components: {

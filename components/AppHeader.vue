@@ -2,6 +2,7 @@
 import {useUser, signOutUser} from "~/composables/useUser";
 import useDarkTheme from "~/composables/useDarkTheme";
 import {QImg} from "quasar";
+import UserAvatar from "~/components/avatar/UserAvatar.vue";
 
 const user = useUser();
 const {qDark} = useDarkTheme();
@@ -39,12 +40,7 @@ const computedAvatarIcon = computed(() => {
                             {{user.public?.displayName}}
                         </span>
                         <q-skeleton v-if="user.loading" class="on-right" type="QAvatar" />
-                        <q-avatar v-else class="on-right" :icon="computedAvatarIcon" size="md" rounded>
-                            <q-img :src="user.public?.photoURL"
-                                   referrerpolicy="no-referrer"
-                                   @load="avatarImgLoaded = true"
-                                   @error="avatarImgLoaded = false" />
-                        </q-avatar>
+                        <UserAvatar class="on-right" :display-name="user.public?.displayName" :photo-url="user.public?.photoURL" />
                         <q-menu class="overflow-auto" fit>
                             <q-list class="text-white text-bold">
                                 <q-item class="bg-accent row justify-between"
