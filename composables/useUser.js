@@ -1,5 +1,5 @@
 import {onAuthStateChanged, reauthenticateWithPopup, GoogleAuthProvider} from 'firebase/auth';
-import {doc, onSnapshot} from "firebase/firestore";
+import {collection, doc, onSnapshot} from "firebase/firestore";
 import APIEndpoints from "~/models/Endpoints";
 
 function useUser(callback = (user) => {}) {
@@ -57,6 +57,20 @@ function useUser(callback = (user) => {}) {
     return user;
 }
 
+function usePublicUser(uid) {
+    const user = reactive({});
+    
+    const db = useFirestore();
+    const userDocRef = doc(collection(db, 'users'), uid);
+    
+    onSnapshot(userDocRef, (doc) => {
+        user.value = doc.data();
+        user.value.id = uid;
+    });
+    
+    return {user};
+}
+
 async function useUserToken() {
     const auth = useFirebaseAuth();
     return await auth.currentUser?.getIdToken(true)
@@ -85,4 +99,4 @@ async function deleteUser() {
     }
 }
 
-export {useUser, useUserToken, signOutUser, deleteUser}
+export {useUser, usePublicUser, useUserToken, signOutUser, deleteUser}

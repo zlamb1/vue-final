@@ -1,27 +1,25 @@
 <script setup>
-import {collection, doc} from "firebase/firestore";
 import UserAvatar from "~/components/avatar/UserAvatar.vue";
 
 const router = useRouter();
 const {qDark} = useDarkTheme();
 
 const props = defineProps({
-    userId: {
-        type: String,
+    user: {
         required: true,
-    }
+    },
 });
-
-const db = useFirestore();
-const user = useDocument(doc(collection(db, 'users'), props.userId));
 </script>
 
 <template>
-    <q-card :flat="qDark" :bordered="qDark">
+    <q-card class="column" :flat="qDark" :bordered="qDark">
         <q-card-section class="row justify-center">
             <q-btn flat>
                 <UserAvatar class="on-left" :display-name="user?.displayName" :photo-url="user?.photoURL" />
                 <span class="title">{{user?.displayName}}</span>
+            </q-btn>
+            <q-btn class="q-ml-auto" icon="more_vert" flat round>
+                <slot name="menu"></slot>
             </q-btn>
         </q-card-section>
         <q-separator />
