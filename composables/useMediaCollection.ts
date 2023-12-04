@@ -23,7 +23,8 @@ const mediaConverter = {
         const list = data.list;
         if (list) {
             const array = [];
-            for (const mediaObject of list) {
+            for (const key in list) {
+                const mediaObject = list[key];
                 let media: any = {type: MediaType.Default};
                 switch (mediaObject.type) {
                     case MediaType.Book:
@@ -60,26 +61,17 @@ export default function useMediaCollection() {
         return response.data.value;
     };
 
-    mediaCollection.dbRemoveByIndex = async(index: number) => {
-        if (index < 0 || index >= mediaCollection.length) {
-            return;
-        }
-
+    mediaCollection.dbRemove = async(media: Media) => {
         const idToken = await useUserToken();
         const response = await useFetch(APIEndpoints.UPDATE_LIST, {
             query: {
                 idToken: idToken,
                 updateAction: UpdateAction.REMOVE,
-                targetIndex: index,
+                updateObject: media.media,
             },
         });
 
         return response.data.value;
-    }
-
-    mediaCollection.dbRemove = async(media: Media) => {
-        const index = mediaCollection.indexOf(media);
-        return mediaCollection.dbRemoveByIndex(index);
     }
 
     useUser((user) => {

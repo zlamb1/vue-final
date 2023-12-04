@@ -6,7 +6,7 @@ export default Object.freeze(Object.defineProperty(class ResponseCode {
     static NO_PERMS = 4;
     static RESOURCE_NOT_FOUND = 5;
     static UNKNOWN_UPDATE_ACTION = 6;
-    static OUT_OF_BOUNDS_ARRAY_INDEX = 7;
+    static INVALID_OBJECT = 7;
     
     static UNKNOWN = -1;
     

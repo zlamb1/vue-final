@@ -190,17 +190,18 @@ function onRemoveImport(book) {
     for (let i = 0; i < mediaCollection.length; i++) {
         const mediaItem = mediaCollection[i];
         if (mediaItem.media === book) {
-            mediaCollection.dbRemoveByIndex(i);
+            mediaCollection.dbRemove(mediaCollection[i]);
             break;
         }
     }
 }
 
 async function deleteSelected() {
-    for (const media of selected.value) {
-        console.log(await mediaCollection.dbRemove(media));
+    const selectedCopy = [...selected.value];
+    for (const media of selectedCopy) {
+        mediaCollection.dbRemove(media);
     }
-    //selected.value = [];
+    selected.value = [];
 }
 
 function onToggleFullscreen() {
@@ -316,14 +317,14 @@ defineExpose({top});
                              @click-import="bookApiDialog.show()"
                              @click-delete="onClickDeleteBtn"
                              @toggle-fullscreen="fullscreen = !fullscreen">
-                <q-checkbox class="q-ml-xs" color="grey-8" v-model="computedSelectAll" v-show="tab === 'grid'" />
+                <q-checkbox class="q-ml-xs" color="grey-8" v-model="computedSelectAll" v-show="tab === 'grid'" :disable="mediaCollection.length < 1" />
             </MediaListHeader>
         </template>
         <template #header-selection>
             <q-checkbox color="grey-8" v-model="computedSelectAll" />
         </template>
         <template #body="props">
-            <MediaRow @edit="openEditDialog(props.row)" :row="props.row">
+            <MediaRow :class="'row-' + props.row.media.uuid" :row="props.row" :key="props.row.media.uuid" @edit="openEditDialog(props.row)">
                 <q-checkbox :val="props.row" v-model="selected" color="grey-8" />
             </MediaRow>
         </template>

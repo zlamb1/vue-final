@@ -1,11 +1,12 @@
+import {FieldValue} from "firebase-admin/firestore";
 import {firestore, useUserToken} from "~/server/api/_firebase";
 import ResponseCode from "~/models/ResponseCode";
 import UpdateAction from "~/models/UpdateAction";
-import {FieldValue} from "firebase-admin/firestore";
+import { v4 as uuidv4 } from 'uuid';
 
 export default defineEventHandler(async (event) => {
     return await useUserToken(event).then(async (user) => {
-        const {updateAction, updateObject, targetIndex, targetUser} = getQuery(event);
+        const {updateAction, updateObject, targetUser} = getQuery(event);
         if (targetUser) {
             // TODO: validate permissions and update target profile
         }
@@ -22,26 +23,29 @@ export default defineEventHandler(async (event) => {
             return ResponseCode.RESOURCE_NOT_FOUND;
         }
         
-        const listCopy = [...listDoc.data().list];
-        const parsedObject = JSON.parse(updateObject ?? '{}');
-        
-        const arrayIndex = parseInt(targetIndex);
-        if (updateAction !== UpdateAction.ADD && (arrayIndex < 0 || arrayIndex >= listCopy.length)) {
-            return ResponseCode.OUT_OF_BOUNDS_ARRAY_INDEX;
-        }
-        
+        const parsedObject = updateObject ? JSON.parse(updateObject) : {};
         const parsedAction = parseInt(updateAction);
+        
         switch (parsedAction) {
             case UpdateAction.ADD:
-                await listDocRef.update('list', FieldValue.arrayUnion(parsedObject));
+                if (parsedObject) {
+                    // generate random id
+                    parsedObject.uuid = uuidv4();
+                } else {
+                    return ResponseCode.INVALID_OBJECT;
+                }
+                await listDocRef.update({
+                    ['list.' + parsedObject.uuid]: parsedObject
+                });
                 break;
             case UpdateAction.UPDATE:
-                listCopy[arrayIndex] = parsedObject;
-                await listDocRef.set({list: listCopy});
+                //listCopy[arrayIndex] = parsedObject;
+                //await listDocRef.set({list: listCopy});
                 break;
             case UpdateAction.REMOVE:
-                listCopy.splice(arrayIndex, 1);
-                await listDocRef.set({list: listCopy});
+                await listDocRef.update({
+                    ['list.' + parsedObject.uuid]: FieldValue.delete(),
+                })
                 break;
             default:
                 return ResponseCode.UNKNOWN_UPDATE_ACTION;

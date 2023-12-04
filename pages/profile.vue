@@ -22,9 +22,9 @@ const bio = ref(null);
 const showMask = ref(false);
 
 if (user.signedIn) {
-    displayName.value = user.data?.displayName;
-    photoURL.value = user.data?.photoURL;
-    bio.value = user.data?.bio;
+    displayName.value = user.public?.displayName;
+    photoURL.value = user.public?.photoURL;
+    bio.value = user.private?.bio;
 }
 
 const saveChanges = async () => {
@@ -69,9 +69,9 @@ const saveChanges = async () => {
 
 watch(user, (newUser) => {
     if (user.signedIn) {
-        displayName.value = newUser.data?.displayName;
-        photoURL.value = newUser.data?.photoURL;
-        bio.value = newUser.data?.bio;
+        displayName.value = newUser.public?.displayName;
+        photoURL.value = newUser.public?.photoURL;
+        bio.value = newUser.private?.bio;
     }
 });
 </script>
@@ -91,7 +91,7 @@ watch(user, (newUser) => {
                     <q-separator class="full-width q-mt-none" />
                     <q-card-section class="column full-width q-gutter-y-md q-py-none q-mt-none">
                         <div class="row justify-center items-center">
-                            <q-avatar class="user-avatar on-left">
+                            <q-avatar class="user-avatar on-left" rounded>
                                 <q-img :src="photoURL" @mouseenter="showMask = true" @mouseleave="showMask = false">
                                     <div class="row justify-center items-center mask fit" v-show="showMask" />
                                     <dynamic-popup-edit v-model="photoURL"></dynamic-popup-edit>
@@ -101,7 +101,7 @@ watch(user, (newUser) => {
                                      v-model="displayName"
                                      stack-label filled />
                         </div>
-                        <q-input label="Bio" v-model="bio" stack-label autogrow filled />
+                        <q-editor v-model="bio" placeholder="Profile Bio" />
                     </q-card-section>
                     <q-card-section class="q-mt-none">
                         <q-btn class="text-bold"

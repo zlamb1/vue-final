@@ -49,7 +49,7 @@ const computedColor = computed(() => {
             <q-date v-model="scope.value" minimal></q-date>
         </div>
         <div v-else-if="type === PopupType.Array">
-            <array-input v-model="scope.value" :label="options" :allow-zero-inputs="true" @empty="popupEdit.hide()" />
+            <array-input v-model="scope.value" :label="options" :allow-zero-inputs="true" :bordered="false" @empty="popupEdit.hide()" />
         </div>
         <div v-else>
             <q-input

@@ -17,7 +17,7 @@ const emit = defineEmits(['update:modelValue', 'edit']);
 </script>
 
 <template>
-    <q-tr>
+    <q-tr v-bind="$attrs">
         <q-td>
             <slot></slot>
         </q-td>

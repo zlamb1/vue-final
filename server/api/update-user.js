@@ -9,37 +9,36 @@ export default defineEventHandler(async (event) => {
             // TODO: validate permissions and update target profile
         }
         
-        const userDocRef = firestore.doc(`users/${user.uid}`);
-        const userDoc = await userDocRef.get();
-        if (!userDoc.exists) {
+        const publicDocRef = firestore.doc(`users/${user.uid}`);
+        const publicDoc = await publicDocRef.get();
+        const privateDocRef = firestore.doc(`users/${user.uid}/private/data`);
+        const privateDoc = await privateDocRef.get();
+        
+        if (!publicDoc.exists || !privateDoc.exists) {
             return ResponseCode.NO_USER;
         }
         
-        const userDocData = userDoc.data();
-        const data = {};
+        const updateData = {};
         
         // displayName is required
-        if (displayName && displayName !== userDocData.displayName) {
-            data.displayName = displayName;
+        if (displayName) {
+            updateData.displayName = displayName;
         }
         
-        if (photoURL !== undefined && photoURL !== userDocData.photoURL) {
-            data.photoURL = photoURL;
+        if (photoURL) {
+            updateData.photoURL = photoURL;
         }
         
-        if (bio !== undefined && bio !== userDocData.bio) {
-            data.bio = bio;
+        if (bio) {
+            await privateDocRef.update({
+                bio: bio,
+            });
         }
         
-        if (profilePrivate !== undefined && profilePrivate !== userDocData.profilePrivate) {
-            data.profilePrivate = profilePrivate;
+        if (Object.keys(updateData).length > 0) {
+            await publicDocRef.update(updateData);
         }
         
-        if (Object.keys(data).length === 0) {
-            return ResponseCode.NO_CHANGE;
-        }
-        
-        await userDocRef.update(data);
         return ResponseCode.SUCCESS;
     }).catch(() => {
         return ResponseCode.UNKNOWN;

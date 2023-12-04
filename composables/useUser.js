@@ -5,18 +5,17 @@ import APIEndpoints from "~/models/Endpoints";
 function useUser(callback = (user) => {}) {
     const db = useFirestore();
     const auth = useFirebaseAuth();
-    const currentUser = useCurrentUser();
     
     const user = reactive({
         loading: true,
         signedIn: false,
-        data: {
-        
-        },
+        public: {},
+        private: {},
         uid: null,
     });
     
     let unsub = () => {}
+    let unsub2 = () => {}
     onAuthStateChanged(auth, (newUser) => {
         if (user.loading) {
             setTimeout(() => {
@@ -27,14 +26,20 @@ function useUser(callback = (user) => {}) {
         if (unsub) {
             unsub();
         }
+        if (unsub2) {
+            unsub2();
+        }
         
         user.signedIn = false;
         if (newUser) {
             user.uid = newUser.uid;
             unsub = onSnapshot(doc(db, 'users', newUser.uid), (doc) => {
-                user.data = doc.data();
+                user.public = doc.data();
                 // only 'sign-in' user once data has been received
                 user.signedIn = true;
+            });
+            unsub2 = onSnapshot(doc(db, `users/${newUser.uid}/private/data`), (doc) => {
+                user.private = doc.data();
             });
         } else {
             // no user

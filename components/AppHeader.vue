@@ -36,11 +36,11 @@ const computedAvatarIcon = computed(() => {
                            flat no-caps>
                         <q-skeleton v-if="user.loading" style="min-width: 100px;" type="text"></q-skeleton>
                         <span v-else class="display-name text-bold">
-                            {{user.data?.displayName}}
+                            {{user.public?.displayName}}
                         </span>
                         <q-skeleton v-if="user.loading" class="on-right" type="QAvatar" />
                         <q-avatar v-else class="on-right" :icon="computedAvatarIcon" size="md" rounded>
-                            <q-img :src="user.data?.photoURL"
+                            <q-img :src="user.public?.photoURL"
                                    referrerpolicy="no-referrer"
                                    @load="avatarImgLoaded = true"
                                    @error="avatarImgLoaded = false" />
