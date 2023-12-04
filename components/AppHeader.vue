@@ -12,23 +12,21 @@ const avatarImgLoaded = ref(false);
 const computedColor = computed(() => {
     return qDark.value ? 'white' : 'primary';
 });
-
-const computedAvatarIcon = computed(() => {
-    return avatarImgLoaded.value ? undefined : 'account_circle';
-})
 </script>
 
 <template>
     <q-header class="row transparent">
-        <q-toolbar>
-            <q-avatar icon="menu_book" size="64px" :text-color="computedColor" />
-            <q-btn :text-color="computedColor"
-                   class="text-bold"
-                   label="The Library"
-                   to="/"
-                   size="24px"
-                   no-caps flat stretch />
-            <div class="row items-center q-gutter-x-md q-ml-auto">
+        <div class="row justify-between wrap full-width">
+            <div>
+                <q-avatar icon="menu_book" size="64px" :text-color="computedColor" />
+                <q-btn :text-color="computedColor"
+                       class="text-bold"
+                       label="The Library"
+                       to="/"
+                       size="24px"
+                       no-caps flat stretch />
+            </div>
+            <div class="row items-center q-gutter-x-md q-mx-md">
                 <slot></slot>
                 <div v-if="user.loading || user.signedIn" class="row items-center">
                     <q-btn class="user-btn row items-center"
@@ -88,7 +86,7 @@ const computedAvatarIcon = computed(() => {
                     LOG IN
                 </q-btn>
             </div>
-        </q-toolbar>
+        </div>
         <q-img class="full-width" height="300px" src="./library.jpg"></q-img>
     </q-header>
 </template>
