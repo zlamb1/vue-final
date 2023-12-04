@@ -56,14 +56,16 @@ const addMediaForm = ref(null);
 const editMediaForm = ref(null);
 const bookApiDialog = ref(null);
 
-const missingPermissions = ref(false);
-
 const props = defineProps({
     tab: {
         type: String,
     },
     id: {
         type: String,
+    },
+    allowEdits: {
+        type: Boolean,
+        default: true,
     }
 });
 
@@ -308,7 +310,7 @@ defineExpose({top});
         :grid="tab === 'grid'"
         :visible-columns="visible"
         separator="cell"
-        selection="multiple"
+        :selection="allowEdits ? 'multiple' : 'none'"
         v-model:selected="selected"
         :fullscreen="fullscreen"
         tabindex="0"
@@ -324,19 +326,20 @@ defineExpose({top});
             <MediaListHeader :table-title="tableTitle"
                              :show-grid-view="tab === 'grid'"
                              :selected="selected"
+                             :allow-edits="allowEdits"
                              @click-add="onClickAddBtn"
                              @click-import="bookApiDialog.show()"
                              @click-delete="onClickDeleteBtn"
                              @toggle-fullscreen="fullscreen = !fullscreen">
-                <q-checkbox class="q-ml-xs" color="grey-8" v-model="computedSelectAll" v-show="tab === 'grid'" :disable="mediaCollection.length < 1" />
+                <q-checkbox v-if="allowEdits && tab === 'grid'" class="q-ml-xs" color="grey-8" v-model="computedSelectAll" :disable="mediaCollection.length < 1" />
             </MediaListHeader>
         </template>
         <template #header-selection>
-            <q-checkbox color="grey-8" v-model="computedSelectAll" />
+            <q-checkbox v-if="allowEdits" color="grey-8" v-model="computedSelectAll" />
         </template>
         <template #body="props">
-            <MediaRow :class="'row-' + props.row.media.uuid" :row="props.row" :key="props.row.media.uuid" @edit="openEditDialog(props.row)">
-                <q-checkbox :val="props.row" v-model="selected" color="grey-8" />
+            <MediaRow :class="'row-' + props.row.media.uuid" :row="props.row" :key="props.row.media.uuid" :allow-edits="allowEdits" @edit="openEditDialog(props.row)">
+                <q-checkbox v-if="allowEdits" :val="props.row" v-model="selected" color="grey-8" />
             </MediaRow>
         </template>
         <template #item="props">
@@ -346,6 +349,7 @@ defineExpose({top});
                 :highlighted="props.row === moveMediaItem"
                 :val="props.row"
                 :key="props.row.media.title + props.row.type"
+                :allow-edits="allowEdits"
                 @edit="openEditDialog(props.row)"
                 @pan="onCardPan"
                 @move="onCardMove">

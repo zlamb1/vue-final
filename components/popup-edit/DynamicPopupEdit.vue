@@ -14,6 +14,10 @@ defineProps({
     options: {
         default: Array(),
     },
+    disable: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 const computedColor = computed(() => {
@@ -24,6 +28,7 @@ const computedColor = computed(() => {
 <template>
     <q-popup-edit :buttons="type === PopupType.Select || type === PopupType.Date"
                   :color="computedColor"
+                  :disable="disable"
                   v-slot="scope"
                   ref="popupEdit"
                   auto-save>

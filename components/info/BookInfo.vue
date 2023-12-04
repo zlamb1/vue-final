@@ -7,7 +7,11 @@ defineProps({
     media: {
         type: Book,
         required: true,
-    }
+    },
+    disable: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>
 
@@ -30,15 +34,16 @@ defineProps({
                     icon="o_star"
                     icon-selected="star"
                     icon-half="star_half"
+                    :disable="disable"
                     no-reset>
                 </q-rating>
             </div>
             <div v-if="media.pagesRead && media.pageCount">
-                <BookKnob :book="media"></BookKnob>
+                <BookKnob :book="media" :disable="disable"></BookKnob>
             </div>
         </div>
-        <q-separator inset vertical></q-separator>
-        <BookView :media="media"></BookView>
+        <q-separator inset vertical />
+        <BookView :media="media" :disable="disable" />
     </div>
 </template>
 

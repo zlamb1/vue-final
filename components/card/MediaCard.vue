@@ -27,6 +27,10 @@ const props = defineProps({
     val: {
         type: Object,
     },
+    allowEdits: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const emit = defineEmits(['edit', 'move', 'pan']);
@@ -35,15 +39,24 @@ const computedSelected = computed(() => {
     return props.selected.includes(props.val);
 })
 
+const computedClasses = computed(() => {
+    return [
+        {'q-table__grid-item--selected' : props.selected.includes(props.val)},
+        props.allowEdits ? 'cursor-pointer' : 'cursor-not-allowed',
+    ]
+});
+
 const computedBorder = computed(() => {
     return qDark.value ? 'border: 1px solid rgba(255, 255, 255, 0.28)' : null;
 })
 
 function onClick() {
-    if (props.selected.includes(props.val)) {
-        props.selected.splice(props.selected.indexOf(props.val), 1);
-    } else {
-        props.selected.push(props.val);
+    if (props.allowEdits) {
+        if (props.selected.includes(props.val)) {
+            props.selected.splice(props.selected.indexOf(props.val), 1);
+        } else {
+            props.selected.push(props.val);
+        }
     }
 }
 
@@ -121,8 +134,8 @@ onMounted(() => {
         @click="onClick"
         ref="wrapper">
         <div
-            class="relative-position cursor-pointer full-height"
-            :class="{ 'q-table__grid-item--selected' : computedSelected }"
+            class="relative-position full-height"
+            :class="computedClasses"
             style="transition: transform 0.5s ease-in-out; will-change: transform;"
             ref="container">
             <div
@@ -147,12 +160,12 @@ onMounted(() => {
                 <q-card-section class="column justify-center items-center">
                     <span class="text-bold">{{media.media.title}}</span>
                     <div>
-                        <MediaToolbar
-                            :show-expand="false"
-                            :media="media.media"
-                            @pointerdown.stop
-                            @mousedown.stop
-                            @edit="$emit('edit')">
+                        <MediaToolbar v-if="allowEdits"
+                                      :show-expand="false"
+                                      :media="media.media"
+                                      @pointerdown.stop
+                                      @mousedown.stop
+                                      @edit="$emit('edit')">
                             <template #prepend>
                                 <q-btn class="on-left"
                                        icon="pan_tool"
@@ -167,7 +180,8 @@ onMounted(() => {
                 </q-card-section>
                 <q-separator inset></q-separator>
                 <component :is="MediaFactory.CreateView(media.type)"
-                           :media="media.media" />
+                           :media="media.media"
+                           :disable="!allowEdits" />
             </q-card>
         </div>
     </div>

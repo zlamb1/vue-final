@@ -10,7 +10,11 @@ const tab = ref($q.screen.lt.md ? 'grid' : 'table');
 const error = ref(false);
 const showBackToTopBtn = ref(false);
 
-let mediaList = ref(null);
+const mediaList = ref(null);
+
+const computedAllowEdits = computed(() => {
+    return !Boolean(route.query.id);
+})
 
 function onError(err) {
     if (err?.message.includes('Missing or insufficient permissions.')) {
@@ -49,7 +53,7 @@ onUnmounted(() => {
                 </q-tooltip>
             </q-btn>
         </div>
-        <MediaList :tab="tab" :id="route.query.id" @error="onError" ref="mediaList"></MediaList>
+        <MediaList :tab="tab" :id="route.query.id" :allow-edits="computedAllowEdits" @error="onError" ref="mediaList"></MediaList>
         <div class="full-width row justify-center fixed-top q-ma-lg" style="z-index: 9999;" v-show="showBackToTopBtn">
             <q-btn
                 icon="keyboard_double_arrow_up"

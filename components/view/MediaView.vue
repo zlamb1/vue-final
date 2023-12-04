@@ -23,7 +23,11 @@ export default {
             /* Override while extending */
             type: Object,
             required: true,
-        }
+        },
+        disable: {
+            type: Boolean,
+            default: false,
+        },
     },
     methods: {
         renderCol(col) {
@@ -52,7 +56,7 @@ export default {
                 <span class="q-table__grid-item-value non-selectable" v-else>
                     {{media[col]}}
                 </span>
-                <DynamicPopupEdit v-model="media[col]" :type="cols[col].type" :options="cols[col].options ?? null"></DynamicPopupEdit>
+                <DynamicPopupEdit v-model="media[col]" :type="cols[col].type" :options="cols[col].options ?? null" :disable="disable" />
             </div>
         </div>
     </q-card-section>

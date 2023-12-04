@@ -44,6 +44,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    disable: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 const computedTrackColor = computed(() => {
@@ -77,6 +81,7 @@ defineEmits(['update:model-value'])
             :thickness="thickness"
             :color="color"
             :track-color="computedTrackColor"
+            :disable="disable"
             v-model="book.completionPercentage"
             v-touch-hold.mouse="() => book.completionPercentage = 100"
             @update:model-value="(value) => $emit('update:model-value', value)"

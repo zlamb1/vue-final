@@ -21,6 +21,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    allowEdits: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const computedExpandColor = computed(() => {
@@ -97,14 +101,14 @@ watch(computedFavorite, async (_new) => {
             @click.stop="$emit('expand')"
             v-if="showExpand"
             round flat />
-        <q-btn
-            class="on-left"
-            color="blue"
-            size="sm"
-            icon="edit"
-            @click.stop="onEdit"
-            round flat />
-        <div class="relative-position" style="overflow: visible;" ref="favoriteContainer">
+        <q-btn v-if="allowEdits"
+               class="on-left"
+               color="blue"
+               size="sm"
+               icon="edit"
+               @click.stop="onEdit"
+               round flat />
+        <div v-if="allowEdits" class="relative-position" style="overflow: visible;" ref="favoriteContainer">
             <q-btn
                 :color="computedHeartColor"
                 size="sm"

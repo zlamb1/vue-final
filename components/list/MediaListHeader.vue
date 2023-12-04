@@ -18,6 +18,10 @@ defineProps({
     selected: {
         type: Array,
     },
+    allowEdits: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const emit = defineEmits(['click-add', 'click-import', 'click-delete', 'toggle-fullscreen']);
@@ -43,12 +47,12 @@ function onClickItem(item) {
             </div>
             <slot></slot>
             <q-space />
-            <q-btn-dropdown
-                class="state-btn text-caption text-bold"
-                label="Add Item"
-                :color="useDarkTheme ? 'green-8' : 'green-6'"
-                ref="dropdownBtn"
-                stretch>
+            <q-btn-dropdown v-if="allowEdits"
+                            class="state-btn text-caption text-bold"
+                            label="Add Item"
+                            :color="useDarkTheme ? 'green-8' : 'green-6'"
+                            ref="dropdownBtn"
+                            stretch>
                 <q-list>
                     <q-item class="text-white text-caption"
                             :class="useDarkTheme ? 'bg-green-8' : 'bg-green-6'"
@@ -69,13 +73,13 @@ function onClickItem(item) {
                     </q-item>
                 </q-list>
             </q-btn-dropdown>
-            <q-btn
-                class="state-btn text-caption text-bold"
-                color="red"
-                :label="selected.length > 1 ? 'Delete Items' : 'Delete Item'"
-                v-show="selected.length > 0"
-                @click="emit('click-delete')"
-                stretch />
+            <q-btn v-if="allowEdits"
+                   class="state-btn text-caption text-bold"
+                   color="red"
+                   :label="selected.length > 1 ? 'Delete Items' : 'Delete Item'"
+                   v-show="selected.length > 0"
+                   @click="emit('click-delete')"
+                   stretch />
             <q-btn
                 icon="fullscreen"
                 v-show="!showGridView"

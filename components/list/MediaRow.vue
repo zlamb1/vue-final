@@ -11,6 +11,10 @@ const props = defineProps({
         type: Media,
         required: true,
     },
+    allowEdits: {
+        type: Boolean,
+        default: true,
+    }
 });
 
 const emit = defineEmits(['update:modelValue', 'edit']);
@@ -18,19 +22,20 @@ const emit = defineEmits(['update:modelValue', 'edit']);
 
 <template>
     <q-tr v-bind="$attrs">
-        <q-td>
+        <q-td v-if="allowEdits">
             <slot></slot>
         </q-td>
         <q-td>
             <div class="row items-center">
                 <div class="cursor-pointer" style="flex: 1 1 0;">
                     <span class="non-selectable">{{ row.media.title }}</span>
-                    <DynamicPopupEdit v-model="row.media.title"></DynamicPopupEdit>
+                    <DynamicPopupEdit v-model="row.media.title" :disable="!allowEdits"></DynamicPopupEdit>
                 </div>
                 <div class="q-ml-auto">
                     <MediaToolbar
                         :expand="row.expand"
                         :media="row.media"
+                        :allow-edits="allowEdits"
                         @edit="emit('edit')"
                         @expand="row.expand = !row.expand">
                     </MediaToolbar>
@@ -51,7 +56,8 @@ const emit = defineEmits(['update:modelValue', 'edit']);
                 <div v-show="row.expand"
                      style="border-bottom: 1px solid rgba(0, 0, 0, 0.12);">
                     <component :is="MediaFactory.CreateInfo(row.type)"
-                               :media="row.media"/>
+                               :media="row.media"
+                               :disable="!allowEdits" />
                 </div>
             </q-slide-transition>
         </q-td>

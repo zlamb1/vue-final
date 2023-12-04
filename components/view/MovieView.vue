@@ -21,6 +21,10 @@ export default {
             type: Movie,
             required: true,
         },
+        disable: {
+            type: Boolean,
+            default: false,
+        },
     },
 }
 </script>

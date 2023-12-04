@@ -22,6 +22,10 @@ export default {
             type: Book,
             required: true,
         },
+        disable: {
+            type: Boolean,
+            default: false,
+        },
     },
 }
 </script>
