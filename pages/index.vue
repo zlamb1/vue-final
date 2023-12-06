@@ -1,6 +1,7 @@
 <script setup>
 import MediaList from "~/components/list/MediaList.vue";
 import UserErrorCard from "~/components/card/UserErrorCard.vue";
+import SplitMediaList from "~/components/list/SplitMediaList.vue";
 
 const $q = useQuasar();
 const route = useRoute();
@@ -48,6 +49,7 @@ onUnmounted(() => {
             <q-tabs :class="qDark ? 'text-white' : 'text-primary'" v-model="tab">
                 <q-tab name="table" icon="o_table_rows" label="Table" />
                 <q-tab name="grid" icon="o_grid_view" label="Grid" />
+                <q-tab name="split" icon="vertical_split" label="Split" />
             </q-tabs>
             <q-btn :color="qDark ? 'white' : 'accent'" size="md" icon="public" flat round>
                 <q-tooltip class="bg-accent text-center">
@@ -55,10 +57,12 @@ onUnmounted(() => {
                 </q-tooltip>
             </q-btn>
         </div>
-        <MediaList :media-collection="mediaCollection"
+        <MediaList v-if="tab !== 'split'"
+                   :media-collection="mediaCollection"
                    :tab="tab"
                    :allow-edits="computedAllowEdits"
                    ref="mediaList" />
+        <SplitMediaList v-else :media-collection="mediaCollection" />
         <div class="full-width row justify-center fixed-top q-ma-lg" style="z-index: 9999;" v-show="showBackToTopBtn">
             <q-btn
                 icon="keyboard_double_arrow_up"
