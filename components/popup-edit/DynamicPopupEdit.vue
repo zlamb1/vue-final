@@ -20,6 +20,8 @@ defineProps({
     }
 });
 
+const emit = defineEmits(['save']);
+
 const computedColor = computed(() => {
     return qDark.value ? 'white' : 'primary';
 });
@@ -30,6 +32,7 @@ const computedColor = computed(() => {
                   :color="computedColor"
                   :disable="disable"
                   v-slot="scope"
+                  @save="emit('save')"
                   ref="popupEdit"
                   auto-save>
         <div v-if="type === PopupType.Number">

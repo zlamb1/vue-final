@@ -14,7 +14,7 @@ const search = ref('');
 
 const computedUsers = computed(() => {
     return users
-        .filter(user => user?.value?.displayName.toLowerCase().includes(search.value.toLowerCase()))
+        .filter(user => user?.data?.displayName?.toLowerCase().includes(search.value.toLowerCase()))
         .filter(user => !hidden.value.includes(user));
 });
 
@@ -33,22 +33,25 @@ onSnapshot(publicDocRef, (_doc) => {
 <template>
     <div>
         <RouterBackButton />
-        <div class="row justify-center q-my-md">
-            <q-input class="col-3" placeholder="Search by Display Name" v-model="search" filled>
-                <template #append>
-                    <q-btn v-show="search" icon="cancel" @click="search = ''" flat round />
-                    <q-btn icon="search" flat round />
-                </template>
-            </q-input>
+        <div class="column items-center">
+            <span class="title non-selectable">Other Users</span>
+            <div class="row justify-center q-my-md full-width">
+                <q-input class="col-3" placeholder="Search by Display Name" v-model="search" filled>
+                    <template #append>
+                        <q-btn v-show="search" icon="cancel" @click="search = ''" flat round />
+                        <q-btn icon="search" flat round />
+                    </template>
+                </q-input>
+            </div>
         </div>
         <div class="row justify-center">
             <q-btn v-if="hidden.length > 0" @click="hidden.length = 0">
                 <span class="non-selectable">Click to show {{hidden.length}} hidden users</span>
             </q-btn>
         </div>
-        <transition-group name="list" mode="out-in" tag="div" class="row" appear>
+        <transition-group name="list" mode="out-in" tag="div" class="row justify-center" appear>
             <div v-for="user in computedUsers" :key="user.id" v-if="users.length > 0" class="col-12 col-md-6 col-lg-4 col-xl-3">
-                <UserCard class="q-ma-sm" :user="user.value" :filter="search">
+                <UserCard class="q-ma-sm" :user="user?.data" :private="user.isPrivate" :filter="search">
                     <template #menu>
                         <q-menu>
                             <q-list>
@@ -64,3 +67,9 @@ onSnapshot(publicDocRef, (_doc) => {
         </transition-group>
     </div>
 </template>
+
+<style scoped>
+.title {
+    font-size: 20px;
+}
+</style>

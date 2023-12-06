@@ -1,7 +1,8 @@
 <script setup>
-const show = ref(false);
-
-defineProps({
+const props = defineProps({
+    showId: {
+        type: String,
+    },
     confirmationPrompt: {
         type: String,
         default: 'Confirm the following:'
@@ -18,19 +19,21 @@ defineProps({
 
 const emit = defineEmits(['confirm']);
 
-function showDialog() {
+const show = ref(false);
+
+function open() {
     show.value = true;
 }
 
-function closeDialog() {
+function hide() {
     show.value = false;
 }
 
-function onClickConfirm() {
+function onConfirm() {
     emit('confirm');
 }
 
-defineExpose({showDialog, closeDialog});
+defineExpose({open, hide});
 </script>
 
 <template>
@@ -47,12 +50,11 @@ defineExpose({showDialog, closeDialog});
                 <q-btn label="Cancel"
                        color="primary"
                        class="text-bold btn-action"
-                       @click="closeDialog"
                        flat v-close-popup />
                 <q-btn :label="btnText"
                        :color="btnColor"
                        class="text-bold btn-action"
-                       @click="onClickConfirm"
+                       @click="onConfirm"
                        v-close-popup />
             </q-card-actions>
         </q-card>

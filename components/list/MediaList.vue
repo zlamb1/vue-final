@@ -5,19 +5,21 @@ import EditDialog from "~/components/dialog/EditDialog.vue";
 import MediaCard from "~/components/card/MediaCard.vue";
 import MediaForm from "~/components/form/MediaForm.vue";
 import MediaListHeader from "~/components/list/MediaListHeader.vue";
+import MediaRow from "~/components/list/MediaRow.vue";
+import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
 import Book from "~/models/Book";
 import {Media, MediaType} from "~/models/Media";
 import Movie from "~/models/Movie";
-import MediaRow from "~/components/list/MediaRow.vue";
-import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
-import UserErrorCard from "~/components/card/UserErrorCard.vue";
+import ResponseCode from "~/models/ResponseCode";
+import MediaCollection from "~/models/MediaCollection";
 
 const {qDark} = useDarkTheme();
+const {notifyPositive, notifyNegative} = useNotify();
 
 const newMediaItem = ref(new Media(new Book()));
 const editMediaItem = ref({});
 const moveMediaItem = ref(null);
-const tableTitle = ref('The Media List');
+const tableTitle = ref('Your Media List');
 
 const columns = ref([
     {
@@ -47,7 +49,6 @@ const selected = ref([]);
 const filters = ref([]);
 const confirmDialog = ref(false);
 const fullscreen = ref(false);
-const tableFocused = ref(false);
 
 const table = ref(null);
 const addDialog = ref(null);
@@ -57,10 +58,11 @@ const editMediaForm = ref(null);
 const bookApiDialog = ref(null);
 
 const props = defineProps({
-    tab: {
-        type: String,
+    mediaCollection: {
+        type: Array,
+        default: reactive(new MediaCollection([])),
     },
-    id: {
+    tab: {
         type: String,
     },
     allowEdits: {
@@ -69,22 +71,14 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['error']);
-
-const onError = (err) => {
-    emit('error', err);
-}
-
-const {mediaCollection} = useMediaCollection(props.id, onError);
-
 const computedList = computed(() => {
     for (const filter of filters.value) {
         filter.filteredCount = 0;
     }
 
-    return mediaCollection.filter((mediaItem) => {
+    return props.mediaCollection?.filter((mediaItem) => {
         for (const filter of filters.value) {
-            if (!filter.matchFilter(mediaItem)) {
+            if (!filter?.matchFilter(mediaItem)) {
                 filter.filteredCount++;
                 return false;
             }
@@ -99,7 +93,7 @@ const computedSelectAll = computed({
             return false;
         } else {
             let found = 0;
-            for (const row of table.value.computedRows) {
+            for (const row of table.value?.computedRows) {
                 if (selected.value.indexOf(row) > -1) {
                     found++;
                 }
@@ -107,7 +101,7 @@ const computedSelectAll = computed({
             switch (found) {
                 case 0:
                     return false;
-                case table.value.computedRows.length:
+                case table.value?.computedRows.length:
                     return true;
                 default:
                     return null;
@@ -118,7 +112,7 @@ const computedSelectAll = computed({
         switch (computedSelectAll.value) {
             case true:
             case null:
-                for (const row of table.value.computedRows) {
+                for (const row of table.value?.computedRows) {
                     const index = selected.value.indexOf(row);
                     if (index > -1) {
                         selected.value.splice(index, 1);
@@ -127,7 +121,7 @@ const computedSelectAll = computed({
 
                 break;
             case false:
-                for (const row of table.value.computedRows) {
+                for (const row of table.value?.computedRows) {
                     if (selected.value.indexOf(row) < 0) {
                         selected.value.push(row);
                     }
@@ -140,7 +134,7 @@ const computedSelectAll = computed({
 
 const computedISBNBooks = computed(() => {
     const books = [];
-    mediaCollection.forEach((mediaItem) => {
+    props.mediaCollection?.forEach((mediaItem) => {
         if (mediaItem.type === MediaType.Book) {
             const book = mediaItem.media;
             if (book && book.isbn) {
@@ -164,46 +158,49 @@ function onClickAddBtn(mediaType) {
             return;
     }
 
-    addDialog.value.showDialog();
+    addDialog.value?.open();
 }
 
 function onClickDeleteBtn() {
-    confirmDialog.value?.showDialog();
+    confirmDialog.value?.open();
 }
 
 function onAddDialogSubmit(mediaItem) {
-    mediaCollection.dbAdd(mediaItem);
-    addDialog.value.hideDialog();
+    props.mediaCollection?.dbAdd(mediaItem);
+    addDialog.value?.hide();
 }
 
 function openEditDialog(mediaItem) {
     editMediaItem.value = mediaItem
-    editDialog.value.showDialog();
+    editDialog.value?.open();
+}
+
+async function updateMediaItem(mediaItem) {
+    const response = await props.mediaCollection?.dbUpdate(mediaItem);
+    if (response === ResponseCode.SUCCESS) {
+        notifyPositive('Successfully edited media item');
+    } else {
+        notifyNegative('Failed to edit media item');
+    }
 }
 
 function onEditDialogSubmit(mediaItem) {
-    editDialog.value.hideDialog();
-    const index = mediaCollection.indexOf(editMediaItem.value);
-    if (index > -1) {
-        mediaCollection[index] = mediaItem;
-    } else {
-        console.warn('Could not find edit book: ', editMediaItem.value);
-    }
-
+    editDialog.value?.hide();
+    updateMediaItem(mediaItem);
     editMediaItem.value = null;
 }
 
 function onImportBook(item) {
     const book = Book.ConvertFromGoogleBookAPI(item);
     const mediaItem = new Media(book);
-    mediaCollection.dbAdd(mediaItem);
+    props.mediaCollection?.dbAdd(mediaItem);
 }
 
 function onRemoveImport(book) {
-    for (let i = 0; i < mediaCollection.length; i++) {
-        const mediaItem = mediaCollection[i];
+    for (let i = 0; i < props.mediaCollection.length; i++) {
+        const mediaItem = props.mediaCollection[i];
         if (mediaItem.media === book) {
-            mediaCollection.dbRemove(mediaCollection[i]);
+            props.mediaCollection?.dbRemove(mediaItem.media);
             break;
         }
     }
@@ -212,23 +209,25 @@ function onRemoveImport(book) {
 async function deleteSelected() {
     const selectedCopy = [...selected.value];
     for (const media of selectedCopy) {
-        mediaCollection.dbRemove(media);
+        props.mediaCollection?.dbRemove(media).then(() => {
+            notifyPositive(`Successfully removed media`);
+        });
     }
     selected.value = [];
 }
 
 function onToggleFullscreen() {
     if (fullscreen.value) {
-        table.value.$el.focus();
+        table.value?.$el?.focus();
     }
 }
 
 function top() {
-    return table.value.$el.getBoundingClientRect().top;
+    return table.value?.$el?.getBoundingClientRect().top;
 }
 
 function getSwapMediaItem(boundingRect, mediaItem) {
-    const cards = table.value.$el.querySelectorAll('.media-card');
+    const cards = table.value?.$el?.querySelectorAll('.media-card');
     const cardWidth = boundingRect.right - boundingRect.left;
     const cardHeight = boundingRect.bottom - boundingRect.top;
     for (const card of cards) {
@@ -247,7 +246,7 @@ function getSwapMediaItem(boundingRect, mediaItem) {
 
 function onCardPan(boundingRect, mediaItem) {
     const swapMediaItem = getSwapMediaItem(boundingRect, mediaItem);
-    const cards = table.value.$el.querySelectorAll('.media-card');
+    const cards = table.value?.$el?.querySelectorAll('.media-card');
     let found = false;
     for (const card of cards) {
         const vueElement = card.__vue__;
@@ -267,7 +266,7 @@ function onCardMove(boundingRect, mediaItem) {
     moveMediaItem.value = null;
     const swapMediaItem = getSwapMediaItem(boundingRect, mediaItem);
     if (swapMediaItem !== null) {
-        mediaCollection.swapItems(mediaItem, swapMediaItem)
+        props.mediaCollection?.swapItems(mediaItem, swapMediaItem)
     }
 }
 
@@ -278,16 +277,16 @@ defineExpose({top});
     <EditDialog
         :btn-text="'Add ' + newMediaItem.type"
         btn-color="green"
-        @show="addMediaForm.focusForm()"
-        @dialog-submit="addMediaForm.submitForm()"
+        @show="addMediaForm?.focusForm()"
+        @dialog-submit="addMediaForm?.submitForm()"
         ref="addDialog">
         <MediaForm :media-item="newMediaItem" @onsubmit="onAddDialogSubmit" ref="addMediaForm" />
     </EditDialog>
     <EditDialog
         btn-text="Save"
         btn-color="blue-8"
-        @show="editMediaForm.focusForm()"
-        @dialog-submit="editMediaForm.submitForm()"
+        @show="editMediaForm?.focusForm()"
+        @dialog-submit="editMediaForm?.submitForm()"
         ref="editDialog">
         <MediaForm :media-item="editMediaItem" @onsubmit="onEditDialogSubmit" ref="editMediaForm" />
     </EditDialog>
@@ -302,24 +301,22 @@ defineExpose({top});
     <BookAPIDialog :books="computedISBNBooks" @import="onImportBook" @remove="onRemoveImport" ref="bookApiDialog" />
     <q-table
         class="q-mx-none"
+        row-key="title"
+        separator="cell"
+        tabindex="0"
+        v-model:selected="selected"
+        v-bind="$attrs"
         :style="qDark && tab === 'table' ? 'border: 1px solid hsla(0,0%,100%,.28)' : null"
         :title="tableTitle"
         :rows="computedList"
-        row-key="title"
         :columns="columns"
         :grid="tab === 'grid'"
         :visible-columns="visible"
-        separator="cell"
         :selection="allowEdits ? 'multiple' : 'none'"
-        v-model:selected="selected"
         :fullscreen="fullscreen"
-        tabindex="0"
-        @focusin="tableFocused = true"
-        @focusout="tableFocused = false"
+        :flat="qDark"
         @fullscreen="onToggleFullscreen"
         @keydown.esc="fullscreen = false"
-        v-bind="$attrs"
-        :flat="qDark"
         ref="table"
         square>
         <template #top>
@@ -338,7 +335,12 @@ defineExpose({top});
             <q-checkbox v-if="allowEdits" color="grey-8" v-model="computedSelectAll" />
         </template>
         <template #body="props">
-            <MediaRow :class="'row-' + props.row.media.uuid" :row="props.row" :key="props.row.media.uuid" :allow-edits="allowEdits" @edit="openEditDialog(props.row)">
+            <MediaRow :class="'row-' + props.row.media.uuid"
+                      :row="props.row"
+                      :key="props.row.media.uuid"
+                      :allow-edits="allowEdits"
+                      @update="updateMediaItem"
+                      @open-edit="openEditDialog(props.row)">
                 <q-checkbox v-if="allowEdits" :val="props.row" v-model="selected" color="grey-8" />
             </MediaRow>
         </template>
@@ -350,16 +352,11 @@ defineExpose({top});
                 :val="props.row"
                 :key="props.row.media.title + props.row.type"
                 :allow-edits="allowEdits"
-                @edit="openEditDialog(props.row)"
+                @update="updateMediaItem"
+                @open-edit="openEditDialog(props.row)"
                 @pan="onCardPan"
                 @move="onCardMove">
             </MediaCard>
         </template>
     </q-table>
 </template>
-
-<style scoped>
-.state-btn {
-    width: 125px;
-}
-</style>

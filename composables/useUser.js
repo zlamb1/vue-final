@@ -1,16 +1,15 @@
 import {onAuthStateChanged, reauthenticateWithPopup, GoogleAuthProvider} from 'firebase/auth';
-import {collection, doc, onSnapshot} from "firebase/firestore";
+import {collection, doc, getDoc, onSnapshot} from "firebase/firestore";
 import APIEndpoints from "~/models/Endpoints";
 
-function useUser(callback = (user) => {}) {
+function useUser(uid, callback = (user) => {}) {
     const db = useFirestore();
     const auth = useFirebaseAuth();
     
     const user = reactive({
         loading: true,
-        signedIn: false,
-        public: {},
-        private: {},
+        public: null,
+        private: null,
         uid: null,
     });
     
@@ -18,54 +17,73 @@ function useUser(callback = (user) => {}) {
     let unsubPrivate = () => {}
     let unsubList = () => {}
     
-    onAuthStateChanged(auth, (newUser) => {
-        if (user.loading) {
-            setTimeout(() => {
-                user.loading = false;
-            }, 500);
-        }
-        
-        unsubPublic();
-        unsubPrivate();
-        unsubList();
-        
-        user.signedIn = false;
-        if (newUser) {
-            user.uid = newUser.uid;
-            unsubPublic = onSnapshot(doc(db, 'users', newUser.uid), (doc) => {
-                user.public = doc.data();
-                // only 'sign-in' user once data has been received
-                user.signedIn = true;
-            });
-            unsubPrivate = onSnapshot(doc(db, `users/${newUser.uid}/private/data`), (doc) => {
-                user.private = doc.data();
-            });
-            unsubList = onSnapshot(doc(db, `lists/${newUser.uid}`), (doc) => {
-                user.list = doc.data();
-            });
-        } else {
-            // no user
-            user.data = null;
-            user.uid = null;
-        }
-        
-        if (callback) {
-            callback(user);
-        }
-    });
+    const onError = () => {
+    
+    }
+    
+    if (uid) {
+        onSnapshot(doc(db, 'users', uid), (doc) => {
+            user.public = doc.data();
+            user.loading = false;
+        }, onError);
+        onSnapshot(doc(db, `users/${uid}/private/data`), (doc) => {
+            user.private = doc.data();
+        }, onError);
+        onSnapshot(doc(db, `lists/${uid}`), (doc) => {
+            user.list = doc.data();
+        }, onError);
+    } else {
+        onAuthStateChanged(auth, (newUser) => {
+            unsubPublic();
+            unsubPrivate();
+            unsubList();
+            
+            if (newUser) {
+                user.uid = newUser?.uid;
+                unsubPublic = onSnapshot(doc(db, 'users', newUser.uid), (doc) => {
+                    user.public = doc.data();
+                    user.loading = false;
+                }, onError);
+                unsubPrivate = onSnapshot(doc(db, `users/${newUser.uid}/private/data`), (doc) => {
+                    user.private = doc.data();
+                }, onError);
+                unsubList = onSnapshot(doc(db, `lists/${newUser.uid}`), (doc) => {
+                    user.list = doc.data();
+                }, onError);
+            } else {
+                // no user
+                user.data = null;
+                user.uid = null;
+            }
+            
+            if (callback) {
+                callback(user);
+            }
+        });
+    }
     
     return user;
 }
 
 function usePublicUser(uid) {
-    const user = reactive({});
+    const user = reactive({
+        data: {},
+        isPrivate: false,
+    });
     
     const db = useFirestore();
     const userDocRef = doc(collection(db, 'users'), uid);
     
     onSnapshot(userDocRef, (doc) => {
-        user.value = doc.data();
-        user.value.id = uid;
+        user.data = doc.data();
+        user.data.id = uid;
+    });
+    
+    const privateDocRef = doc(collection(db, `users/${uid}/private`), 'data');
+    getDoc(privateDocRef).then(() => {
+        user.isPrivate = false;
+    }).catch(() => {
+        user.isPrivate = true;
     });
     
     return {user};
@@ -74,7 +92,7 @@ function usePublicUser(uid) {
 async function useUserToken() {
     const auth = useFirebaseAuth();
     return await auth.currentUser?.getIdToken(true)
-        .catch(function(err) {
+        .catch(() => {
             // handle error
         });
 }

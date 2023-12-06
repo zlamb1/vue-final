@@ -1,13 +1,9 @@
 <script setup>
-import {useUser, signOutUser} from "~/composables/useUser";
-import useDarkTheme from "~/composables/useDarkTheme";
 import {QImg} from "quasar";
 import UserAvatar from "~/components/avatar/UserAvatar.vue";
 
 const user = useUser();
 const {qDark} = useDarkTheme();
-
-const avatarImgLoaded = ref(false);
 
 const computedColor = computed(() => {
     return qDark.value ? 'white' : 'primary';
@@ -28,7 +24,7 @@ const computedColor = computed(() => {
             </div>
             <div class="row items-center q-gutter-x-md q-mx-md">
                 <slot></slot>
-                <div v-if="user.loading || user.signedIn" class="row items-center">
+                <div v-if="!user.loading" class="row items-center">
                     <q-btn class="user-btn row items-center"
                            :color="computedColor"
                            size="md"

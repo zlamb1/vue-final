@@ -1,5 +1,5 @@
 import type {SnapshotOptions} from 'firebase/firestore';
-import {collection, doc, onSnapshot, QueryDocumentSnapshot} from "firebase/firestore";
+import {collection, doc, onSnapshot, QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore";
 import {Media, MediaType} from "~/models/Media";
 import Book from "~/models/Book";
 import Movie from "~/models/Movie";
@@ -7,6 +7,7 @@ import MediaCollection from "~/models/MediaCollection";
 import APIEndpoints from "~/models/Endpoints";
 import UpdateAction from "~/models/UpdateAction";
 import {FirebaseError} from "@firebase/app";
+import {Exception} from "sass";
 
 const mediaConverter = {
     toFirestore(collection: Media[]) : Object {
@@ -43,7 +44,7 @@ const mediaConverter = {
     }
 }
 
-export default function useMediaCollection(userId, onError = (err) => {}) {
+export default function useMediaCollection(uid: string, onError = (err: Error) => {}) {
     const mediaCollection = reactive(MediaCollection([]));
     
     const db = useFirestore();
@@ -62,6 +63,19 @@ export default function useMediaCollection(userId, onError = (err) => {}) {
         return response.data.value;
     };
 
+    mediaCollection.dbUpdate = async (media: Media) => {
+        const idToken = await useUserToken();
+        const response = await useFetch(APIEndpoints.UPDATE_LIST, {
+            query: {
+                idToken: idToken,
+                updateAction: UpdateAction.UPDATE,
+                updateObject: JSON.stringify(media.media),
+            }
+        });
+
+        return response.data.value;
+    }
+
     mediaCollection.dbRemove = async(media: Media) => {
         const idToken = await useUserToken();
         const response = await useFetch(APIEndpoints.UPDATE_LIST, {
@@ -75,6 +89,7 @@ export default function useMediaCollection(userId, onError = (err) => {}) {
         return response.data.value;
     }
 
+    // @ts-ignore
     const onDocUpdate = (doc) => {
         mediaCollection.length = 0;
         const collection = doc.data();
@@ -85,11 +100,11 @@ export default function useMediaCollection(userId, onError = (err) => {}) {
         }
     }
 
-    if (userId) {
-        const docRef = doc(collection(db, 'lists'), userId).withConverter(mediaConverter);
+    if (uid) {
+        const docRef = doc(collection(db, 'lists'), uid).withConverter(mediaConverter);
         unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
     } else {
-        useUser((user) => {
+        useUser(undefined, (user) => {
             unsubscribe();
             if (user.uid) {
                 const docRef = doc(collection(db, 'lists'), user.uid).withConverter(mediaConverter);

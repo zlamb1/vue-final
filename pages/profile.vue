@@ -1,29 +1,38 @@
 <script setup>
-import {useQuasar} from "quasar";
-import useDarkTheme from "~/composables/useDarkTheme";
+import DOMPurify from "dompurify";
 import DynamicPopupEdit from "~/components/popup-edit/DynamicPopupEdit.vue";
 import UserErrorCard from "~/components/card/UserErrorCard.vue";
 import ResponseCode from "~/models/ResponseCode";
 import RouterBackButton from "~/components/button/RouterBackButton.vue";
 import APIEndpoints from "~/models/Endpoints";
+import UserAvatar from "~/components/avatar/UserAvatar.vue";
 
 definePageMeta({
    middleware: 'auth'
 });
 
+const route = useRoute();
+const uid = route.query.id;
+const isPersonalProfile = ref(!Boolean(uid));
+
 const $q = useQuasar();
-const user = useUser();
+const user = useUser(uid);
 const {qDark} = useDarkTheme();
 
-const displayName = ref(null);
+const displayName = ref('');
 const photoURL = ref(null);
-const bio = ref(null);
+const bio = ref('');
 
-const showMask = ref(false);
+const sanitizedBio = computed(() => {
+    return DOMPurify.sanitize(bio.value, { USE_PROFILES: { html: true } });
+});
 
-if (user.signedIn) {
+if (user?.public) {
     displayName.value = user.public?.displayName;
     photoURL.value = user.public?.photoURL;
+}
+
+if (user?.private) {
     bio.value = user.private?.bio;
 }
 
@@ -45,7 +54,7 @@ const saveChanges = async () => {
             idToken: idToken,
             displayName: displayName.value,
             photoURL: photoURL.value,
-            bio: bio.value,
+            bio: bio.value ? bio.value : '',
         }
     });
 
@@ -68,10 +77,13 @@ const saveChanges = async () => {
 }
 
 watch(user, (newUser) => {
-    if (user.signedIn) {
-        displayName.value = newUser.public?.displayName;
-        photoURL.value = newUser.public?.photoURL;
-        bio.value = newUser.private?.bio;
+    if (user.public) {
+        displayName.value = newUser?.public?.displayName;
+        photoURL.value = newUser?.public?.photoURL;
+    }
+    if (user.private) {
+        console.log(bio.value);
+        bio.value = newUser?.private?.bio;
     }
 });
 </script>
@@ -82,31 +94,50 @@ watch(user, (newUser) => {
         <div class="row justify-center items-center">
             <div class="col-8 col-md-6 col-lg-4">
                 <q-skeleton v-if="user.loading" type="rect" class="full-width" height="200px" />
-                <q-card v-else-if="user.signedIn"
+                <q-card v-else-if="user.public"
                         class="column items-center q-gutter-y-lg full-width"
                         :flat="qDark" :bordered="qDark">
-                    <q-card-section class="text-center q-mt-none q-pa-md">
-                        <span class="text-h5 q-ma-none non-selectable">Profile</span>
+                    <q-card-section class="row justify-center items-center q-mt-none q-pa-md">
+                        <UserAvatar :display-name="user?.public?.displayName"
+                                    :photo-url="user?.public?.photoURL"
+                                    :hover-color="isPersonalProfile ? 'rgba(110, 228, 255, 0.2)' : undefined"
+                                    :class="isPersonalProfile ? 'cursor-pointer' : null"
+                                    class="on-left"
+                                    size="54px">
+                            <dynamic-popup-edit :disable="!isPersonalProfile" v-model="photoURL" />
+                        </UserAvatar>
+                        <q-input v-if="isPersonalProfile"
+                                 label="Display Name"
+                                 v-model="displayName"
+                                 stack-label filled />
+                        <span class="title non-selectable" v-else>{{displayName}}</span>
                     </q-card-section>
                     <q-separator class="full-width q-mt-none" />
-                    <q-card-section class="column full-width q-gutter-y-md q-py-none q-mt-none">
-                        <div class="row justify-center items-center">
-                            <q-avatar class="user-avatar on-left" rounded>
-                                <q-img :src="photoURL" @mouseenter="showMask = true" @mouseleave="showMask = false">
-                                    <div class="row justify-center items-center mask fit" v-show="showMask" />
-                                    <dynamic-popup-edit v-model="photoURL"></dynamic-popup-edit>
-                                </q-img>
-                            </q-avatar>
-                            <q-input label="Display Name"
-                                     v-model="displayName"
-                                     stack-label filled />
+                    <q-card-section class="column full-width q-gutter-y-md q-pt-none q-mt-none">
+                        <q-editor v-if="isPersonalProfile" v-model="bio" placeholder="Profile Bio" />
+                        <div v-else>
+                            <q-expansion-item style="font-size: 16px; border-radius: 15px;"
+                                              label="Profile Bio"
+                                              class="shadow-1 overflow-hidden"
+                                              header-class="bg-accent text-white"
+                                              expand-icon-class="text-white"
+                                              icon="perm_identity"
+                                              :default-opened="true"
+                                              dense-toggle
+                                              expand-separator>
+                                <q-card v-if="sanitizedBio" class="bio q-pa-md">
+                                    <div v-html="sanitizedBio" />
+                                </q-card>
+                                <q-card v-else class="bio q-pa-md">This user has no bio.</q-card>
+                            </q-expansion-item>
                         </div>
-                        <q-editor v-model="bio" placeholder="Profile Bio" />
                     </q-card-section>
-                    <q-card-section class="q-mt-none">
+                    <q-card-section v-if="isPersonalProfile" class="q-mt-none">
                         <q-btn class="text-bold"
                                color="blue-8"
-                               @click="saveChanges">Save Changes</q-btn>
+                               @click="saveChanges">
+                            Save Changes
+                        </q-btn>
                     </q-card-section>
                 </q-card>
                 <div class="full-width" v-else>
@@ -118,13 +149,10 @@ watch(user, (newUser) => {
 </template>
 
 <style scoped>
-.user-avatar {
-    --image-size: 65px;
-    width: var(--image-size);
-    height: var(--image-size);
+.title {
+    font-size: 20px;
 }
-.mask {
-    background: rgba(255, 255, 255, 0.15);
-    cursor: pointer;
+.bio {
+    font-size: 16px;
 }
 </style>

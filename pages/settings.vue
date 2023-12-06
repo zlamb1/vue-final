@@ -92,9 +92,9 @@ async function onDeleteUser() {
 }
 
 watch(user, (newUser) => {
-    if (newUser.signedIn) {
-        profileVisibility.value = newUser.private?.visibility;
-        listVisibility.value = newUser.list?.visibility;
+    if (!newUser?.loading) {
+        profileVisibility.value = newUser?.private?.visibility;
+        listVisibility.value = newUser?.list?.visibility;
     }
 });
 </script>

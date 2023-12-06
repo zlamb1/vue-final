@@ -1,6 +1,11 @@
 import {firestore, useUserToken} from "~/server/api/_firebase";
-import ResponseCode from "~/models/ResponseCode";
 import {FieldValue} from "firebase-admin/firestore";
+import { JSDOM } from 'jsdom';
+import DOMPurify from 'dompurify';
+import ResponseCode from "~/models/ResponseCode";
+
+const window = new JSDOM('').window;
+const purify = DOMPurify(window);
 
 function parseVisibility(visibility) {
     switch (visibility?.toLowerCase()) {
@@ -39,7 +44,7 @@ export default defineEventHandler(async (event) => {
             return ResponseCode.NO_USER;
         }
         
-        if (listVisibility) {
+        if (listVisibility !== undefined) {
             await updateListVisibility(user.uid, listVisibility);
         }
         
@@ -49,7 +54,7 @@ export default defineEventHandler(async (event) => {
                 update.displayName = displayName;
             }
             
-            if (photoURL) {
+            if (photoURL !== undefined) {
                 update.photoURL = photoURL;
             }
             
@@ -60,11 +65,11 @@ export default defineEventHandler(async (event) => {
         
         {
             const update = {};
-            if (bio) {
-                update.bio = bio;
+            if (bio !== undefined) {
+                update.bio = purify.sanitize(bio, { USE_PROFILES: { html: true } });
             }
             
-            if (profileVisibility) {
+            if (profileVisibility !== undefined) {
                 update.visibility = profileVisibility;
             }
             

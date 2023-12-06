@@ -39,8 +39,12 @@ export default defineEventHandler(async (event) => {
                 });
                 break;
             case UpdateAction.UPDATE:
-                //listCopy[arrayIndex] = parsedObject;
-                //await listDocRef.set({list: listCopy});
+                if (!parsedObject) {
+                    return ResponseCode.INVALID_OBJECT;
+                }
+                await listDocRef.update({
+                    ['list.' + parsedObject.uuid]: parsedObject
+                })
                 break;
             case UpdateAction.REMOVE:
                 await listDocRef.update({

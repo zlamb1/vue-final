@@ -12,6 +12,8 @@ defineProps({
         default: false,
     },
 });
+
+const emit = defineEmits(['update']);
 </script>
 
 <template>
@@ -22,7 +24,7 @@ defineProps({
                :src="media.imageUrl"
                :ratio="3/4" />
         <q-separator inset vertical />
-        <MovieView :media="media" :disable="disable" />
+        <MovieView :media="media" :disable="disable" @update="emit('update')" />
     </div>
 </template>
 

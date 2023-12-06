@@ -33,11 +33,11 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['edit', 'move', 'pan']);
+const emit = defineEmits(['update', 'open-edit', 'move', 'pan']);
 
 const computedSelected = computed(() => {
     return props.selected.includes(props.val);
-})
+});
 
 const computedClasses = computed(() => {
     return [
@@ -165,7 +165,7 @@ onMounted(() => {
                                       :media="media.media"
                                       @pointerdown.stop
                                       @mousedown.stop
-                                      @edit="$emit('edit')">
+                                      @edit="$emit('open-edit')">
                             <template #prepend>
                                 <q-btn class="on-left"
                                        icon="pan_tool"
@@ -181,7 +181,8 @@ onMounted(() => {
                 <q-separator inset></q-separator>
                 <component :is="MediaFactory.CreateView(media.type)"
                            :media="media.media"
-                           :disable="!allowEdits" />
+                           :disable="!allowEdits"
+                           @update="emit('update', media)" />
             </q-card>
         </div>
     </div>

@@ -13,9 +13,11 @@
   "dependencies": {
     "@quasar/extras": "^1.16.8",
     "consola": "^3.2.3",
+    "dompurify": "^3.0.6",
     "firebase": "^10.6.0",
     "firebase-admin": "^11.11.1",
     "firebaseui": "^6.1.0",
+    "jsdom": "^23.0.1",
     "lodash": "^4.17.21",
     "nuxt-quasar-ui": "^2.0.6",
     "nuxt-vuefire": "^0.4.1",

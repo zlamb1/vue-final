@@ -13,6 +13,8 @@ defineProps({
         default: false,
     },
 });
+
+const emit = defineEmits(['update']);
 </script>
 
 <template>
@@ -35,15 +37,15 @@ defineProps({
                     icon-selected="star"
                     icon-half="star_half"
                     :disable="disable"
-                    no-reset>
-                </q-rating>
+                    @update:model-value="emit('update')"
+                    no-reset />
             </div>
             <div v-if="media.pagesRead && media.pageCount">
-                <BookKnob :book="media" :disable="disable"></BookKnob>
+                <BookKnob :book="media" :disable="disable" @update:model-value="emit('update')" />
             </div>
         </div>
         <q-separator inset vertical />
-        <BookView :media="media" :disable="disable" />
+        <BookView :media="media" :disable="disable" @update="emit('update')" />
     </div>
 </template>
 

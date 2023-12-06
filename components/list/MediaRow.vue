@@ -17,7 +17,7 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['update:modelValue', 'edit']);
+const emit = defineEmits(['update:modelValue', 'update', 'open-edit']);
 </script>
 
 <template>
@@ -29,14 +29,14 @@ const emit = defineEmits(['update:modelValue', 'edit']);
             <div class="row items-center">
                 <div class="cursor-pointer" style="flex: 1 1 0;">
                     <span class="non-selectable">{{ row.media.title }}</span>
-                    <DynamicPopupEdit v-model="row.media.title" :disable="!allowEdits"></DynamicPopupEdit>
+                    <DynamicPopupEdit v-model="row.media.title" :disable="!allowEdits" @save="emit('update')" />
                 </div>
                 <div class="q-ml-auto">
                     <MediaToolbar
                         :expand="row.expand"
                         :media="row.media"
                         :allow-edits="allowEdits"
-                        @edit="emit('edit')"
+                        @edit="emit('open-edit')"
                         @expand="row.expand = !row.expand">
                     </MediaToolbar>
                 </div>
@@ -57,7 +57,8 @@ const emit = defineEmits(['update:modelValue', 'edit']);
                      style="border-bottom: 1px solid rgba(0, 0, 0, 0.12);">
                     <component :is="MediaFactory.CreateInfo(row.type)"
                                :media="row.media"
-                               :disable="!allowEdits" />
+                               :disable="!allowEdits"
+                               @update="emit('update', row)" />
                 </div>
             </q-slide-transition>
         </q-td>

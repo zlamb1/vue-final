@@ -6,6 +6,8 @@ const $q = useQuasar();
 const route = useRoute();
 const {qDark} = useDarkTheme();
 
+const {mediaCollection} = useMediaCollection(route?.query?.id, onError)
+
 const tab = ref($q.screen.lt.md ? 'grid' : 'table');
 const error = ref(false);
 const showBackToTopBtn = ref(false);
@@ -53,7 +55,10 @@ onUnmounted(() => {
                 </q-tooltip>
             </q-btn>
         </div>
-        <MediaList :tab="tab" :id="route.query.id" :allow-edits="computedAllowEdits" @error="onError" ref="mediaList"></MediaList>
+        <MediaList :media-collection="mediaCollection"
+                   :tab="tab"
+                   :allow-edits="computedAllowEdits"
+                   ref="mediaList" />
         <div class="full-width row justify-center fixed-top q-ma-lg" style="z-index: 9999;" v-show="showBackToTopBtn">
             <q-btn
                 icon="keyboard_double_arrow_up"

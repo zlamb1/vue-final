@@ -1,6 +1,4 @@
 <script setup>
-const show = ref(false);
-
 defineProps({
     clearFunc: {
         type: Function,
@@ -15,15 +13,17 @@ defineProps({
     },
 });
 
-function showDialog() {
+const show = ref(false);
+
+function open() {
     show.value = true;
 }
 
-function hideDialog() {
+function hide() {
     show.value = false;
 }
 
-defineExpose({showDialog, hideDialog});
+defineExpose({open, hide});
 </script>
 
 <template>

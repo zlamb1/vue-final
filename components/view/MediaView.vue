@@ -29,10 +29,11 @@ export default {
             default: false,
         },
     },
+    emits: ['update'],
     methods: {
         renderCol(col) {
             if (this.cols[col].type === PopupType.Array) {
-                return this.media[col].length > 0;
+                return this.media[col]?.length > 0;
             }
             return Boolean(this.media[col]);
         }
@@ -56,7 +57,11 @@ export default {
                 <span class="q-table__grid-item-value non-selectable" v-else>
                     {{media[col]}}
                 </span>
-                <DynamicPopupEdit v-model="media[col]" :type="cols[col].type" :options="cols[col].options ?? null" :disable="disable" />
+                <DynamicPopupEdit v-model="media[col]"
+                                  :type="cols[col].type"
+                                  :options="cols[col].options ?? null"
+                                  :disable="disable"
+                                  @save="$emit('update')" />
             </div>
         </div>
     </q-card-section>
