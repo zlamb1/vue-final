@@ -37,7 +37,7 @@ const emit = defineEmits(['update:modelValue', 'update', 'open-edit', 'expand'])
                 </div>
                 <div class="q-ml-auto">
                     <MediaToolbar
-                        :expand="row.expand"
+                        :expand="expanded"
                         :media="row.media"
                         :allow-edits="allowEdits"
                         @edit="emit('open-edit')"
