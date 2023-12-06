@@ -14,10 +14,14 @@ const props = defineProps({
     allowEdits: {
         type: Boolean,
         default: true,
+    },
+    expanded: {
+        type: Boolean,
+        default: false,
     }
 });
 
-const emit = defineEmits(['update:modelValue', 'update', 'open-edit']);
+const emit = defineEmits(['update:modelValue', 'update', 'open-edit', 'expand']);
 </script>
 
 <template>
@@ -37,7 +41,7 @@ const emit = defineEmits(['update:modelValue', 'update', 'open-edit']);
                         :media="row.media"
                         :allow-edits="allowEdits"
                         @edit="emit('open-edit')"
-                        @expand="row.expand = !row.expand">
+                        @expand="emit('expand')">
                     </MediaToolbar>
                 </div>
             </div>
@@ -53,7 +57,7 @@ const emit = defineEmits(['update:modelValue', 'update', 'open-edit']);
     <q-tr style="height: 0;">
         <q-td class="expand-td" colspan="100%">
             <q-slide-transition :duration="500">
-                <div v-show="row.expand"
+                <div v-show="expanded"
                      style="border-bottom: 1px solid rgba(0, 0, 0, 0.12);">
                     <component :is="MediaFactory.CreateInfo(row.type)"
                                :media="row.media"

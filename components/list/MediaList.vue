@@ -20,6 +20,7 @@ const newMediaItem = ref(new Media(new Book()));
 const editMediaItem = ref({});
 const moveMediaItem = ref(null);
 const tableTitle = ref('Your Media List');
+const expanded = ref({});
 
 const columns = ref([
     {
@@ -180,6 +181,7 @@ async function updateMediaItem(mediaItem) {
     if (response === ResponseCode.SUCCESS) {
         notifyPositive('Successfully edited media item');
     } else {
+        console.log(response);
         notifyNegative('Failed to edit media item');
     }
 }
@@ -339,8 +341,10 @@ defineExpose({top});
                       :row="props.row"
                       :key="props.row.media.uuid"
                       :allow-edits="allowEdits"
+                      :expanded="Boolean(expanded[props.row.media.uuid])"
                       @update="updateMediaItem"
-                      @open-edit="openEditDialog(props.row)">
+                      @open-edit="openEditDialog(props.row)"
+                      @expand="expanded[props.row.media.uuid] = !Boolean(expanded[props.row.media.uuid])">
                 <q-checkbox v-if="allowEdits" :val="props.row" v-model="selected" color="grey-8" />
             </MediaRow>
         </template>

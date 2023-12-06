@@ -98,6 +98,8 @@ export default function useMediaCollection(uid: string, onError = (err: Error) =
                 mediaCollection.push(media);
             }
         }
+        // @ts-ignore
+        mediaCollection.sort((m1, m2) => m1?.media?.title?.localeCompare(m2?.media?.title));
     }
 
     if (uid) {
