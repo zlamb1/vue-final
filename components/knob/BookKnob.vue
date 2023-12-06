@@ -50,6 +50,11 @@ const props = defineProps({
     }
 });
 
+const emit = defineEmits(['update:model-value'])
+
+const updating = ref(false);
+const knobModel = ref(props.book?.completionPercentage);
+
 const computedTrackColor = computed(() => {
     return qDark.value && !props.overrideDark ? 'grey-4' : props.trackColor;
 });
@@ -62,17 +67,44 @@ const computedCenterColor = computed(() => {
     return qDark.value && !props.overrideDark ? 'white' : props.centerColor;
 });
 
-defineEmits(['update:model-value'])
+function onUpdate() {
+    if (!updating.value) {
+        updating.value = true;
+    }
+}
+
+const closeDebounce = 250;
+function onSave() {
+    setTimeout(() => {
+        updating.value = false;
+    }, closeDebounce);
+    props.book.completionPercentage = knobModel.value;
+    emit('update:model-value', knobModel.value);
+}
+
+function onCancel() {
+    setTimeout(() => {
+        updating.value = false;
+    }, closeDebounce);
+    knobModel.value = props.book?.completionPercentage;
+}
+
+watch(() => props.book, () => {
+    knobModel.value = props.book?.completionPercentage;
+});
 </script>
 
 <template>
-    <div class="column items-center q-gutter-y-sm">
+    <div class="column items-center q-gutter-y-sm relative-position">
+        <q-card v-show="updating" class="absolute-bottom" style="z-index: 99; bottom: -25%;">
+            <q-card-section class="row justify-center">
+                <q-btn class="col-5 q-mr-md" @click="onCancel">Cancel</q-btn>
+                <q-btn class="col-5" color="blue-8" @click="onSave">Save</q-btn>
+            </q-card-section>
+        </q-card>
         <span class="non-selectable" :class="'text-' + computedHeaderColor" v-show="header">
          Completion Percentage:
         </span>
-        <q-tooltip>
-            Click and holds for 2 seconds to set to 100%
-        </q-tooltip>
         <q-knob
             :min="0"
             :max="100"
@@ -82,13 +114,16 @@ defineEmits(['update:model-value'])
             :color="color"
             :track-color="computedTrackColor"
             :disable="disable"
-            v-model="book.completionPercentage"
+            v-model="knobModel"
             v-touch-hold.mouse="() => book.completionPercentage = 100"
-            @update:model-value="(value) => $emit('update:model-value', value)"
+            @update:model-value="onUpdate"
             show-value>
             <span :class="'text-' + computedCenterColor" :style="'font-size:' + fontSize">
-                {{book.completionPercentage.toFixed(1) + '%'}}
+                {{knobModel?.toFixed(1) + '%'}}
             </span>
+            <q-tooltip>
+                Click and holds for 2 seconds to set to 100%
+            </q-tooltip>
         </q-knob>
     </div>
 </template>
