@@ -23,7 +23,6 @@ const emit = defineEmits(['update']);
                placeholder-src="~/assets/placeholder_cover.png"
                :src="media.imageUrl"
                :ratio="3/4" />
-        <q-separator inset vertical />
         <MovieView :media="media" :disable="disable" @update="emit('update')" />
     </div>
 </template>

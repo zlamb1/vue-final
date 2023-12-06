@@ -24,7 +24,6 @@ const emit = defineEmits(['update']);
                placeholder-src="./src/assets/placeholder_cover.png"
                :src="media.imageUrl"
                :ratio="3/4" />
-        <q-separator inset vertical></q-separator>
         <div class="column items-center q-gutter-y-md">
             <div v-if="media.rating" class="column items-center">
                 <span>Rating:</span>
@@ -44,7 +43,6 @@ const emit = defineEmits(['update']);
                 <BookKnob :book="media" :disable="disable" @update:model-value="emit('update')" />
             </div>
         </div>
-        <q-separator inset vertical />
         <BookView :media="media" :disable="disable" @update="emit('update')" />
     </div>
 </template>
