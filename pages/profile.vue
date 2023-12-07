@@ -12,11 +12,17 @@ definePageMeta({
 });
 
 const route = useRoute();
-const uid = route.query.id;
-const isPersonalProfile = ref(!Boolean(uid));
+
+const computedUID = computed(() => {
+    return route?.query?.id;
+});
+
+const isPersonalProfile = computed(() => {
+    return !Boolean(computedUID.value);
+});
 
 const $q = useQuasar();
-const user = useUser(uid);
+const user = useUser(computedUID);
 const {qDark} = useDarkTheme();
 
 const displayName = ref('');
@@ -82,7 +88,6 @@ watch(user, (newUser) => {
         photoURL.value = newUser?.public?.photoURL;
     }
     if (user.private) {
-        console.log(bio.value);
         bio.value = newUser?.private?.bio;
     }
 });

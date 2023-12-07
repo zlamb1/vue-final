@@ -7,7 +7,11 @@ const $q = useQuasar();
 const route = useRoute();
 const {qDark} = useDarkTheme();
 
-const {mediaCollection} = useMediaCollection(route?.query?.id, onError)
+const computedId = computed(() => {
+    return route?.query?.id;
+});
+
+let {mediaCollection} = useMediaCollection(computedId, onError)
 
 const tab = ref($q.screen.lt.md ? 'grid' : 'table');
 const error = ref(false);
@@ -43,7 +47,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     document.removeEventListener('scroll', onScrollEvent);
-})
+});
 </script>
 
 <template>

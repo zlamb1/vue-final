@@ -2,8 +2,10 @@
 import SliderToggle from "~/components/toggle/SliderToggle.vue";
 import useBookApi from "~/composables/useBookApi";
 
+const route = useRoute();
 const $q = useQuasar();
 const {dark, useDarkThemeTransition} = useDarkTheme();
+
 // load initial value
 $q.dark.set(dark.value);
 

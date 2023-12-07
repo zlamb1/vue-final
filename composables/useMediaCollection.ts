@@ -44,7 +44,7 @@ const mediaConverter = {
     }
 }
 
-export default function useMediaCollection(uid: string, onError = (err: Error) => {}) {
+export default function useMediaCollection(uid: computed, onError = (err: Error) => {}) {
     const mediaCollection = reactive(MediaCollection([]));
     
     const db = useFirestore();
@@ -102,18 +102,26 @@ export default function useMediaCollection(uid: string, onError = (err: Error) =
         mediaCollection.sort((m1, m2) => m1?.media?.title?.localeCompare(m2?.media?.title));
     }
 
-    if (uid) {
-        const docRef = doc(collection(db, 'lists'), uid).withConverter(mediaConverter);
-        unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
-    } else {
-        useUser(undefined, (user) => {
-            unsubscribe();
-            if (user.uid) {
-                const docRef = doc(collection(db, 'lists'), user.uid).withConverter(mediaConverter);
-                unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
-            }
-        });
+    const createSnapshot = () => {
+        if (uid.value) {
+            const docRef = doc(collection(db, 'lists'), uid.value).withConverter(mediaConverter);
+            unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
+        } else {
+            useUser(undefined, (user) => {
+                unsubscribe();
+                if (user.uid) {
+                    const docRef = doc(collection(db, 'lists'), user.uid).withConverter(mediaConverter);
+                    unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
+                }
+            });
+        }
     }
+
+    createSnapshot();
+    watch(uid, () => {
+       unsubscribe();
+       createSnapshot();
+    });
     
     return {mediaCollection};
 }

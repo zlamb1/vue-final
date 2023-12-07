@@ -1,8 +1,9 @@
+import type {ComputedRef} from "vue";
 import {onAuthStateChanged, reauthenticateWithPopup, GoogleAuthProvider} from 'firebase/auth';
 import {collection, doc, getDoc, onSnapshot} from "firebase/firestore";
 import APIEndpoints from "~/models/Endpoints";
 
-function useUser(uid, callback = (user) => {}) {
+function useUser(uid : string | ComputedRef<string>, callback = (user) => {}) {
     const db = useFirestore();
     const auth = useFirebaseAuth();
     
@@ -12,53 +13,64 @@ function useUser(uid, callback = (user) => {}) {
         private: null,
         uid: null,
     });
-    
+
+    let unsubAuth = () => {}
     let unsubPublic = () => {}
     let unsubPrivate = () => {}
     let unsubList = () => {}
     
-    const onError = () => {
-    
-    }
-    
-    if (uid) {
-        onSnapshot(doc(db, 'users', uid), (doc) => {
+    const onError = () => {}
+
+    const createSnapshot = (uid) => {
+        unsubPublic = onSnapshot(doc(db, 'users', uid), (doc) => {
             user.public = doc.data();
             user.loading = false;
         }, onError);
-        onSnapshot(doc(db, `users/${uid}/private/data`), (doc) => {
+        unsubPrivate = onSnapshot(doc(db, `users/${uid}/private/data`), (doc) => {
             user.private = doc.data();
         }, onError);
-        onSnapshot(doc(db, `lists/${uid}`), (doc) => {
+        unsubList = onSnapshot(doc(db, `lists/${uid}`), (doc) => {
             user.list = doc.data();
         }, onError);
+    }
+
+    if (typeof uid === 'string') {
+        createSnapshot(uid);
     } else {
-        onAuthStateChanged(auth, (newUser) => {
+        const createUserSnapshot = (uid) => {
+            if (uid) {
+                unsubAuth = () => {}
+                createSnapshot(uid);
+            } else {
+                unsubAuth = onAuthStateChanged(auth, (newUser) => {
+                    unsubPublic();
+                    unsubPrivate();
+                    unsubList();
+
+                    if (newUser) {
+                        user.uid = newUser?.uid;
+                        createSnapshot(newUser?.uid);
+                    } else {
+                        // no user
+                        user.data = null;
+                        user.uid = null;
+                    }
+
+                    if (callback) {
+                        callback(user);
+                    }
+                });
+            }
+        }
+
+        createUserSnapshot(uid?.value);
+
+        watch(uid, (newUID) => {
+            unsubAuth();
             unsubPublic();
             unsubPrivate();
             unsubList();
-            
-            if (newUser) {
-                user.uid = newUser?.uid;
-                unsubPublic = onSnapshot(doc(db, 'users', newUser.uid), (doc) => {
-                    user.public = doc.data();
-                    user.loading = false;
-                }, onError);
-                unsubPrivate = onSnapshot(doc(db, `users/${newUser.uid}/private/data`), (doc) => {
-                    user.private = doc.data();
-                }, onError);
-                unsubList = onSnapshot(doc(db, `lists/${newUser.uid}`), (doc) => {
-                    user.list = doc.data();
-                }, onError);
-            } else {
-                // no user
-                user.data = null;
-                user.uid = null;
-            }
-            
-            if (callback) {
-                callback(user);
-            }
+            createUserSnapshot(newUID);
         });
     }
     
