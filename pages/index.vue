@@ -26,11 +26,15 @@ function onError(err) {
 }
 
 function scrollToTop() {
-    window.scroll(0, window.scrollY + mediaList.value.top());
+    window.scroll(0, window.scrollY + mediaList.value?.top());
 }
 
 const onScrollEvent = () => {
-    showBackToTopBtn.value = mediaList.value.top() < 0
+    if (mediaList.value) {
+        showBackToTopBtn.value = mediaList.value?.top() < 0
+    } else if (showBackToTopBtn.value) {
+        showBackToTopBtn.value = false;
+    }
 }
 
 onMounted(() => {

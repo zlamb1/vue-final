@@ -102,11 +102,7 @@
     transform-origin: left;
 }
 
-.collapse-enter-from {
-    transform: scaleX(0);
-}
-
-.collapse-leave-to {
+.collapse-enter-from, .collapse-leave-to {
     transform: scaleX(0);
 }
 
@@ -119,4 +115,16 @@
 .list-leave-to {
     opacity: 0;
     transform: translateX(30px);
+}
+
+.delay-enter-active {
+    transition-delay: 0.25s;
+}
+
+.delay-enter-active, .delay-leave-active {
+    transition: opacity 0.25s;
+}
+
+.delay-enter-from, .delay-leave-to {
+    opacity: 0;
 }
