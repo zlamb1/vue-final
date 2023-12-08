@@ -8,6 +8,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    height: {
+        type: String,
+        default: '300px',
+    },
 });
 
 const emit = defineEmits(['empty']);
@@ -24,21 +28,23 @@ function onRemoveItem(mediaItem) {
 
 <template>
     <q-list class="q-my-md" bordered>
-        <q-item v-for="mediaItem in selected"
-                :key="mediaItem.type + mediaItem.media.title"
-                :active="active"
-                active-class="text-red"
-                @click="onRemoveItem(mediaItem)"
-                v-ripple.early clickable>
-            <q-item-section avatar>
-                <q-avatar text-color="primary"
-                          :icon="MediaFactory.CreateIcon(mediaItem.type)"
-                          rounded />
-            </q-item-section>
-            <div class="row full-width items-center">
-                <span class="non-selectable text-primary">{{mediaItem.media.title}}</span>
-            </div>
-        </q-item>
+        <q-scroll-area :style="'height: ' + height">
+            <q-item v-for="mediaItem in selected"
+                    :key="mediaItem.type + mediaItem.media.title"
+                    :active="active"
+                    active-class="text-red"
+                    @click="onRemoveItem(mediaItem)"
+                    v-ripple.early clickable>
+                <q-item-section avatar>
+                    <q-avatar text-color="primary"
+                              :icon="MediaFactory.CreateIcon(mediaItem.type)"
+                              rounded />
+                </q-item-section>
+                <div class="row full-width items-center">
+                    <span class="non-selectable text-primary">{{mediaItem.media.title}}</span>
+                </div>
+            </q-item>
+        </q-scroll-area>
     </q-list>
 </template>
 

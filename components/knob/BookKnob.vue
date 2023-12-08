@@ -96,10 +96,10 @@ watch(() => props.book, () => {
 
 <template>
     <div class="column items-center q-gutter-y-sm relative-position">
-        <q-card v-show="updating" class="absolute-bottom" style="z-index: 99; bottom: -25%;">
+        <q-card v-show="updating" class="absolute-bottom" :flat="qDark" :bordered="qDark" style="z-index: 99; bottom: -25%;">
             <q-card-section class="row justify-center">
                 <q-btn class="col-5 q-mr-md" @click="onCancel">Cancel</q-btn>
-                <q-btn class="col-5" color="blue-8" @click="onSave">Save</q-btn>
+                <q-btn class="col-5" :color="color" @click="onSave">Save</q-btn>
             </q-card-section>
         </q-card>
         <span class="non-selectable" :class="'text-' + computedHeaderColor" v-show="header">

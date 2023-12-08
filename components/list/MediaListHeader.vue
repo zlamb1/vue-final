@@ -2,6 +2,7 @@
 import FilterList from "~/components/list/FilterList.vue";
 import {MediaType} from "~/models/Media";
 import {Filter} from "~/models/Filter";
+import AddMediaButton from "~/components/button/AddMediaButton.vue";
 
 const dropdownBtn = ref(null);
 const filters = ref([]);
@@ -24,7 +25,7 @@ defineProps({
     },
 });
 
-const emit = defineEmits(['click-add', 'click-import', 'click-delete', 'toggle-fullscreen']);
+const emit = defineEmits(['click-add', 'click-delete', 'toggle-fullscreen']);
 
 function onAddFilter(filterString) {
     filters.value.push(new Filter(filterString));
@@ -47,32 +48,7 @@ function onClickItem(item) {
             </div>
             <slot></slot>
             <q-space />
-            <q-btn-dropdown v-if="allowEdits"
-                            class="state-btn text-caption text-bold"
-                            label="Add Item"
-                            :color="useDarkTheme ? 'green-8' : 'green-6'"
-                            ref="dropdownBtn"
-                            stretch>
-                <q-list>
-                    <q-item class="text-white text-caption"
-                            :class="useDarkTheme ? 'bg-green-8' : 'bg-green-6'"
-                            @click="emit('click-import')"
-                            clickable v-close-popup>
-                        <q-item-section>
-                            <q-item-label>Import</q-item-label>
-                        </q-item-section>
-                    </q-item>
-                    <q-item class="text-white text-caption"
-                            :class="useDarkTheme ? 'bg-green-8' : 'bg-green-6'"
-                            v-for="item in MediaType" :key="item"
-                            @click="onClickItem(item)"
-                            clickable v-close-popup>
-                        <q-item-section>
-                            <q-item-label>{{item}}</q-item-label>
-                        </q-item-section>
-                    </q-item>
-                </q-list>
-            </q-btn-dropdown>
+            <add-media-button v-if="allowEdits" @click="onClickItem" />
             <q-btn v-if="allowEdits"
                    class="state-btn text-caption text-bold"
                    color="red"

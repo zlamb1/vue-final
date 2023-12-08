@@ -65,13 +65,15 @@ function useUser(uid : string | ComputedRef<string>, callback = (user) => {}) {
 
         createUserSnapshot(uid?.value);
 
-        watch(uid, (newUID) => {
-            unsubAuth();
-            unsubPublic();
-            unsubPrivate();
-            unsubList();
-            createUserSnapshot(newUID);
-        });
+        if (uid) {
+            watch(uid, (newUID) => {
+                unsubAuth();
+                unsubPublic();
+                unsubPrivate();
+                unsubList();
+                createUserSnapshot(newUID);
+            });
+        }
     }
     
     return user;

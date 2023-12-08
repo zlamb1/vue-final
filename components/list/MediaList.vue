@@ -9,12 +9,10 @@ import MediaRow from "~/components/list/MediaRow.vue";
 import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
 import Book from "~/models/Book";
 import {Media, MediaType} from "~/models/Media";
-import Movie from "~/models/Movie";
-import ResponseCode from "~/models/ResponseCode";
+import MediaFactory from "~/models/factory/MediaFactory";
 import MediaCollection from "~/models/MediaCollection";
 
 const {qDark} = useDarkTheme();
-const {notifyPositive, notifyNegative} = useNotify();
 
 const newMediaItem = ref(new Media(new Book()));
 const editMediaItem = ref({});
@@ -71,6 +69,8 @@ const props = defineProps({
         default: true,
     }
 });
+
+const emit = defineEmits(['add-media', 'update-media', 'remove-media']);
 
 const computedList = computed(() => {
     for (const filter of filters.value) {
@@ -147,18 +147,11 @@ const computedISBNBooks = computed(() => {
 });
 
 function onClickAddBtn(mediaType) {
-    switch (mediaType) {
-        case MediaType.Book:
-            newMediaItem.value = new Media(new Book());
-            break;
-        case MediaType.Movie:
-            newMediaItem.value = new Media(new Movie());
-            break;
-        default:
-            console.warn('Trying to open add dialog with undefined media type!');
-            return;
+    if (mediaType === 'import') {
+        bookApiDialog.value?.show();
+        return;
     }
-
+    newMediaItem.value = MediaFactory.CreateInstance(mediaType);
     addDialog.value?.open();
 }
 
@@ -167,7 +160,7 @@ function onClickDeleteBtn() {
 }
 
 function onAddDialogSubmit(mediaItem) {
-    props.mediaCollection?.dbAdd(mediaItem);
+    emit('add-media', mediaItem);
     addDialog.value?.hide();
 }
 
@@ -176,33 +169,21 @@ function openEditDialog(mediaItem) {
     editDialog.value?.open();
 }
 
-async function updateMediaItem(mediaItem) {
-    const response = await props.mediaCollection?.dbUpdate(mediaItem);
-    if (response === ResponseCode.SUCCESS) {
-        notifyPositive('Successfully edited media item');
-    } else {
-        console.log(response);
-        notifyNegative('Failed to edit media item');
-    }
-}
-
 function onEditDialogSubmit(mediaItem) {
-    editDialog.value?.hide();
-    updateMediaItem(mediaItem);
-    editMediaItem.value = null;
+    emit('update-media', mediaItem);
 }
 
 function onImportBook(item) {
     const book = Book.ConvertFromGoogleBookAPI(item);
     const mediaItem = new Media(book);
-    props.mediaCollection?.dbAdd(mediaItem);
+    emit('add-media', mediaItem)
 }
 
 function onRemoveImport(book) {
     for (let i = 0; i < props.mediaCollection.length; i++) {
         const mediaItem = props.mediaCollection[i];
         if (mediaItem.media === book) {
-            props.mediaCollection?.dbRemove(mediaItem.media);
+            emit('remove-media', mediaItem);
             break;
         }
     }
@@ -211,9 +192,7 @@ function onRemoveImport(book) {
 async function deleteSelected() {
     const selectedCopy = [...selected.value];
     for (const media of selectedCopy) {
-        props.mediaCollection?.dbRemove(media).then(() => {
-            notifyPositive(`Successfully removed media`);
-        });
+        emit('remove-media', media);
     }
     selected.value = [];
 }
@@ -293,7 +272,7 @@ defineExpose({top});
         <MediaForm :media-item="editMediaItem" @onsubmit="onEditDialogSubmit" ref="editMediaForm" />
     </EditDialog>
     <ConfirmationDialog
-        confirmation-prompt="Confirm that you want to delete the following items"
+        confirmation-prompt="Confirm that you want to delete the following items."
         btnText="Delete"
         btnColor="red"
         @confirm="deleteSelected"
@@ -327,7 +306,6 @@ defineExpose({top});
                              :selected="selected"
                              :allow-edits="allowEdits"
                              @click-add="onClickAddBtn"
-                             @click-import="bookApiDialog.show()"
                              @click-delete="onClickDeleteBtn"
                              @toggle-fullscreen="fullscreen = !fullscreen">
                 <q-checkbox v-if="allowEdits && tab === 'grid'" class="q-ml-xs" color="grey-8" v-model="computedSelectAll" :disable="mediaCollection.length < 1" />
@@ -342,7 +320,7 @@ defineExpose({top});
                       :key="props.row.media.uuid"
                       :allow-edits="allowEdits"
                       :expanded="Boolean(expanded[props.row.media.uuid])"
-                      @update="updateMediaItem"
+                      @update="emit('update-media', props.row)"
                       @open-edit="openEditDialog(props.row)"
                       @expand="expanded[props.row.media.uuid] = !Boolean(expanded[props.row.media.uuid])">
                 <q-checkbox v-if="allowEdits" :val="props.row" v-model="selected" color="grey-8" />
@@ -356,7 +334,7 @@ defineExpose({top});
                 :val="props.row"
                 :key="props.row.media.title + props.row.type"
                 :allow-edits="allowEdits"
-                @update="updateMediaItem"
+                @update="emit('update-media', props.row)"
                 @open-edit="openEditDialog(props.row)"
                 @pan="onCardPan"
                 @move="onCardMove">

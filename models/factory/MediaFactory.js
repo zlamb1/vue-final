@@ -1,4 +1,6 @@
-import {MediaType} from "~/models/Media";
+import {Media, MediaType} from "~/models/Media";
+import Book from '~/models/Book';
+import Movie from '~/models/Movie';
 
 import BookInfo from "~/components/info/BookInfo.vue";
 import BookView from "~/components/view/BookView.vue";
@@ -8,6 +10,16 @@ import BookForm from "~/components/form/BookForm.vue";
 import MovieForm from "~/components/form/MovieForm.vue";
 
 export default class MediaFactory {
+    static CreateInstance(type) {
+        switch (type) {
+            case MediaType.Book:
+                return new Media(new Book());
+            case MediaType.Movie:
+                return new Media(new Movie());
+            default:
+                return new Media(new Book());
+        }
+    }
     static CreateInfo(type) {
         type = type ?? MediaType.Default;
         const componentMap = {};

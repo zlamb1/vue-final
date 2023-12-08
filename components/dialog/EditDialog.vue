@@ -30,7 +30,7 @@ defineExpose({open, hide});
     <q-dialog v-model="show">
         <q-card class="q-px-xl q-py-md">
             <q-card-section>
-                <slot></slot>
+                <slot name="default"></slot>
             </q-card-section>
             <q-card-actions align="right">
                 <q-btn label="Cancel"
@@ -41,7 +41,8 @@ defineExpose({open, hide});
                        :color="btnColor"
                        class="text-bold"
                        style="width: 125px;"
-                       @click="$emit('dialog-submit')" />
+                       @click="$emit('dialog-submit')"
+                       v-close-popup />
             </q-card-actions>
         </q-card>
     </q-dialog>
