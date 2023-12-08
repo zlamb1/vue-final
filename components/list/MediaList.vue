@@ -6,11 +6,12 @@ import MediaCard from "~/components/card/MediaCard.vue";
 import MediaForm from "~/components/form/MediaForm.vue";
 import MediaListHeader from "~/components/list/MediaListHeader.vue";
 import MediaRow from "~/components/list/MediaRow.vue";
-import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
+import BookAPIDialog from "~/components/dialog/APIDialog.vue";
 import Book from "~/models/Book";
 import {Media, MediaType} from "~/models/Media";
 import MediaFactory from "~/models/factory/MediaFactory";
 import MediaCollection from "~/models/MediaCollection";
+import APIDialog from "~/components/dialog/APIDialog.vue";
 
 const {qDark} = useDarkTheme();
 
@@ -54,7 +55,7 @@ const addDialog = ref(null);
 const editDialog = ref(null);
 const addMediaForm = ref(null);
 const editMediaForm = ref(null);
-const bookApiDialog = ref(null);
+const apiDialog = ref(null);
 
 const props = defineProps({
     mediaCollection: {
@@ -148,7 +149,7 @@ const computedISBNBooks = computed(() => {
 
 function onClickAddBtn(mediaType) {
     if (mediaType === 'import') {
-        bookApiDialog.value?.show();
+        apiDialog.value?.show();
         return;
     }
     newMediaItem.value = MediaFactory.CreateInstance(mediaType);
@@ -279,7 +280,7 @@ defineExpose({top});
         ref="confirmDialog">
         <DeleteList :selected="selected" @empty="confirmDialog.closeDialog()" />
     </ConfirmationDialog>
-    <BookAPIDialog :books="computedISBNBooks" @import="onImportBook" @remove="onRemoveImport" ref="bookApiDialog" />
+    <APIDialog :books="computedISBNBooks" @import="onImportBook" @remove="onRemoveImport" ref="apiDialog" />
     <q-table
         class="q-mx-none"
         row-key="title"

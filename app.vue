@@ -1,6 +1,6 @@
 <script setup>
 import SliderToggle from "~/components/toggle/SliderToggle.vue";
-import useBookApi from "~/composables/useBookApi";
+import useGoogleBookApi from "~/composables/useGoogleBookApi";
 
 const route = useRoute();
 const $q = useQuasar();

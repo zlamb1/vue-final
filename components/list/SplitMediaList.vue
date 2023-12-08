@@ -4,11 +4,12 @@ import MediaToolbar from "~/components/toolbar/MediaToolbar.vue";
 import MediaForm from "~/components/form/MediaForm.vue";
 import MediaCollection from "~/models/MediaCollection";
 import MediaFactory from "~/models/factory/MediaFactory";
-import BookAPIDialog from "~/components/dialog/BookAPIDialog.vue";
+import BookAPIDialog from "~/components/dialog/APIDialog.vue";
 import {Media, MediaType} from "~/models/Media";
 import AddMediaButton from "~/components/button/AddMediaButton.vue";
 import Book from "~/models/Book";
 import ConfirmationDialog from "~/components/dialog/ConfirmationDialog.vue";
+import APIDialog from "~/components/dialog/APIDialog.vue";
 
 const $q = useQuasar();
 
@@ -32,7 +33,7 @@ const editForm = ref(null);
 const addDialog = ref(null);
 const addForm = ref(null);
 const confirmDialog = ref(null);
-const bookAPIDialog = ref(null);
+const apiDialog = ref(null);
 const listScrollArea = ref(null);
 
 const addItem = ref(MediaFactory.CreateInstance());
@@ -84,7 +85,7 @@ function onSubmitAdd() {
 
 function onClickAddMedia(type) {
     if (type === 'import') {
-        bookAPIDialog.value?.show();
+        apiDialog.value?.show();
     } else {
         addItem.value = MediaFactory.CreateInstance(type);
         addDialog.value?.open();
@@ -135,7 +136,7 @@ onBeforeRouteUpdate(() => {
                 </q-item>
             </q-list>
         </confirmation-dialog>
-        <BookAPIDialog :books="computedBooks" ref="bookAPIDialog" />
+        <APIDialog :books="computedBooks" ref="apiDialog" />
         <div v-morph:menu:group:200.tween.resize="morphGroupModel"
              class="col-12 col-md-3 col-lg-2 left">
             <q-scroll-area style="height: 100%;" ref="listScrollArea">
