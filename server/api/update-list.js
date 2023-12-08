@@ -37,6 +37,9 @@ export default defineEventHandler(async (event) => {
                 await listDocRef.update({
                     ['list.' + parsedObject.uuid]: parsedObject
                 });
+                await listDocRef.update({
+                    ['modifications.' + Date.now()]: 'add',
+                });
                 break;
             case UpdateAction.UPDATE:
                 if (!parsedObject) {
@@ -44,12 +47,18 @@ export default defineEventHandler(async (event) => {
                 }
                 await listDocRef.update({
                     ['list.' + parsedObject.uuid]: parsedObject
-                })
+                });
+                await listDocRef.update({
+                    ['modifications.' + Date.now()]: 'update',
+                });
                 break;
             case UpdateAction.REMOVE:
                 await listDocRef.update({
                     ['list.' + parsedObject.uuid]: FieldValue.delete(),
                 })
+                await listDocRef.update({
+                    ['modifications.' + Date.now()]: 'remove',
+                });
                 break;
             default:
                 return ResponseCode.UNKNOWN_UPDATE_ACTION;
