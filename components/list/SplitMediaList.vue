@@ -58,6 +58,11 @@ const computedShowContent = computed(() => {
     return !(morphGroupModel.value === 'menu' && $q.screen.lt.md);
 });
 
+const showScrollBtn = computed(() => {
+    const scroll = listScrollArea.value?.getScroll();
+    return scroll?.verticalSize !== scroll?.verticalContainerSize;
+});
+
 const nextMorphStep = {
     menu: 'btn',
     btn: 'menu',
@@ -160,9 +165,10 @@ onBeforeRouteUpdate(() => {
                         <add-media-button class="full-width" @click="onClickAddMedia" />
                     </q-item>
                     <div style="position: fixed; right: 10px; bottom: 10px;">
-                        <q-btn :icon="computedScrollUp ? 'arrow_drop_up' : 'arrow_drop_down'"
+                        <q-btn v-show="showScrollBtn"
                                color="primary"
                                size="sm"
+                               :icon="computedScrollUp ? 'arrow_drop_up' : 'arrow_drop_down'"
                                @click="onClickScrollBtn"
                                round push />
                     </div>
@@ -177,9 +183,13 @@ onBeforeRouteUpdate(() => {
                         <q-btn class="fit-content" icon="menu" @click="nextMorph" flat round />
                     </div>
                     <div v-if="selected" class="q-ml-auto">
-                        <MediaToolbar v-if="allowEdits" :show-expand="false" :media="selected.media" @edit="onOpenEdit">
+                        <MediaToolbar v-if="allowEdits"
+                                      :show-expand="false"
+                                      :media="selected.media"
+                                      @edit="onOpenEdit"
+                                      @favorite="emit('update-media', selected)">
                             <template #prepend>
-                                <q-btn class="on-left" icon="delete" color="red-6" size="sm" @click="confirmDialog?.open()" flat round />
+                                <q-btn class="on-left" icon="delete" color="grey-8" size="sm" @click="confirmDialog?.open()" flat round />
                             </template>
                         </MediaToolbar>
                     </div>

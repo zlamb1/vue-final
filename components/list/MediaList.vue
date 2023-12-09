@@ -134,19 +134,6 @@ const computedSelectAll = computed({
     }
 });
 
-const computedISBNBooks = computed(() => {
-    const books = [];
-    props.mediaCollection?.forEach((mediaItem) => {
-        if (mediaItem.type === MediaType.Book) {
-            const book = mediaItem.media;
-            if (book && book.isbn) {
-                books.push(book);
-            }
-        }
-    });
-    return books;
-});
-
 function onClickAddBtn(mediaType) {
     if (mediaType === 'import') {
         apiDialog.value?.show();
@@ -172,20 +159,6 @@ function openEditDialog(mediaItem) {
 
 function onEditDialogSubmit(mediaItem) {
     emit('update-media', mediaItem);
-}
-
-function onImportBook(item) {
-    emit('add-media', item);
-}
-
-function onRemoveImport(book) {
-    for (let i = 0; i < props.mediaCollection.length; i++) {
-        const mediaItem = props.mediaCollection[i];
-        if (mediaItem.media === book) {
-            emit('remove-media', mediaItem);
-            break;
-        }
-    }
 }
 
 async function deleteSelected() {
@@ -278,7 +251,10 @@ defineExpose({top});
         ref="confirmDialog">
         <DeleteList :selected="selected" @empty="confirmDialog.closeDialog()" />
     </ConfirmationDialog>
-    <APIDialog :books="computedISBNBooks" @import="onImportBook" @remove="onRemoveImport" ref="apiDialog" />
+    <APIDialog :existing-items="mediaCollection"
+               @import="(item) => emit('add-media', item)"
+               @remove="(item) => emit('remove-media', item)"
+               ref="apiDialog" />
     <q-table
         class="q-mx-none"
         row-key="title"

@@ -40,8 +40,9 @@ const emit = defineEmits(['update:modelValue', 'update', 'open-edit', 'expand'])
                         :expand="expanded"
                         :media="row.media"
                         :allow-edits="allowEdits"
+                        @expand="emit('expand')"
                         @edit="emit('open-edit')"
-                        @expand="emit('expand')">
+                        @favorite="emit('update')">
                     </MediaToolbar>
                 </div>
             </div>
