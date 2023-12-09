@@ -21,6 +21,9 @@ const searchPerformed = ref(false);
 const search = ref('');
 const awaitingFetch = ref(false);
 const maxResults = ref(10);
+const latestAction = ref(Date.now());
+
+const actionTimeout = 1000;
 
 const cardCount = {
     xs: 1,
@@ -88,38 +91,46 @@ async function onSearch() {
     }
 }
 
-const {notifyNegative} = useNotify();
-function onImport(rawItem) {
-    let media = undefined;
-    if (rawItem?.volumeInfo) {
-        media = Book.ConvertFromGoogleBookAPI(rawItem);
-    } else {
-        media = Song.ConvertFromITunesAPI(rawItem);
-    }
-    if (!media) {
-        notifyNegative('Error occurred while importing: invalid api object');
-        return;
-    }
-    const mediaItem = new Media(media);
-    emit('import', mediaItem);
-}
-
-function doesMediaExist(mediaItem) {
+function findExistingItem(mediaItem) {
     const volumeInfo = mediaItem?.volumeInfo;
     for (let i = 0; i < props.existingItems?.length; i++) {
         const media = props.existingItems[i]?.media;
         if (volumeInfo) {
             if (mediaItem?.id === media?.googleBooksId) {
-                return true;
+                return props.existingItems[i];
             }
         } else {
             if (mediaItem?.trackId === media?.trackId) {
-                return true;
+                return props.existingItems[i];
             }
         }
     }
+}
 
-    return false;
+const {notifyNegative} = useNotify();
+
+function onImport(rawItem) {
+    if (Date.now() - latestAction.value > actionTimeout) {
+        latestAction.value = Date.now();
+        const media = rawItem?.volumeInfo ? Book.ConvertFromGoogleBookAPI(rawItem) : Song.ConvertFromITunesAPI(rawItem);
+        emit('import', new Media(media));
+    } else {
+        notifyNegative('Please wait a few moments before performing another action!');
+    }
+}
+
+function onRemove(rawItem) {
+    if (Date.now() - latestAction.value > actionTimeout) {
+        latestAction.value = Date.now();
+        const existingItem = findExistingItem(rawItem);
+        if (existingItem) {
+            emit('remove', existingItem);
+        } else {
+            notifyNegative("Error occurred: couldn't find item in media collection.");
+        }
+    } else {
+        notifyNegative('Please wait a few moments before performing another action!');
+    }
 }
 
 function nextMorph() {
@@ -214,8 +225,9 @@ defineExpose({show});
                         <component class="full-height q-mx-sm"
                                    :is="item?.volumeInfo ? APIBookCard : APISongCard"
                                    :item="item"
-                                   :removable="doesMediaExist(item)"
-                                   @add="onImport" />
+                                   :removable="!!findExistingItem(item)"
+                                   @add="onImport"
+                                   @remove="onRemove" />
                     </div>
                 </transition-group>
                 <div v-if="mediaItems.length === 0 && !awaitingFetch" class="row full-width justify-center q-mt-lg">

@@ -128,7 +128,10 @@ onBeforeRouteUpdate(() => {
                 </q-item>
             </q-list>
         </confirmation-dialog>
-        <APIDialog :existing-items="mediaCollection" @import="(item) => emit('add-media', item)" ref="apiDialog" />
+        <APIDialog :existing-items="mediaCollection"
+                   @import="(item) => emit('add-media', item)"
+                   @remove="(item) => emit('remove-media', item)"
+                   ref="apiDialog" />
         <div v-morph:menu:group:200.tween.resize="morphGroupModel"
              class="col-12 col-md-3 col-lg-2 left">
             <q-scroll-area style="height: 100%;" ref="listScrollArea">
