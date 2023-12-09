@@ -4,9 +4,16 @@ import UserErrorCard from "~/components/card/UserErrorCard.vue";
 import SplitMediaList from "~/components/list/SplitMediaList.vue";
 import ResponseCode from "~/models/ResponseCode";
 
-const $q = useQuasar();
+const router = useRouter();
 const route = useRoute();
+const $q = useQuasar();
 const {qDark} = useDarkTheme();
+
+useUser(undefined, (user) => {
+    if (!user) {
+        router.push({path: '/', query: {id: 'global'}, replace: true})
+    }
+});
 
 const {notifyPositive, notifyNegative} = useNotify();
 
@@ -25,6 +32,14 @@ const mediaList = ref(null);
 const computedAllowEdits = computed(() => {
     return !Boolean(route.query.id);
 })
+
+function onClickGlobal() {
+    if (route?.query?.id === 'global') {
+        router.push({path: '/'});
+    } else {
+        router.push({path: '/', query: {id: 'global'}})
+    }
+}
 
 function onError(err) {
     if (err?.message.includes('Missing or insufficient permissions.')) {
@@ -90,7 +105,7 @@ onUnmounted(() => {
                 <q-tab name="split" icon="vertical_split" label="Split" />
                 <q-tab v-show="computedAllowEdits" name="graph" icon="bar_chart" label="Graph" />
             </q-tabs>
-            <q-btn :color="qDark ? 'white' : 'accent'" size="md" icon="public" flat round>
+            <q-btn size="md" icon="public" :color="qDark ? 'white' : 'accent'" @click="onClickGlobal" flat round>
                 <q-tooltip class="bg-accent text-center">
                     Click to view the global media list.
                 </q-tooltip>
@@ -111,7 +126,7 @@ onUnmounted(() => {
                         @update-media="updateMediaItem"
                         @remove-media="removeMediaItem" />
         <GraphView v-if="tab === 'graph' && computedAllowEdits" />
-        <div class="full-width row justify-center fixed-top q-ma-lg" style="z-index: 9999;" v-show="showBackToTopBtn">
+        <div class="full-width row justify-center fixed-top q-ma-lg" style="z-index: 99;" v-show="showBackToTopBtn">
             <q-btn
                 icon="keyboard_double_arrow_up"
                 :color="qDark ? 'grey-6' : 'primary'"

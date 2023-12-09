@@ -8,7 +8,7 @@ import APIEndpoints from "~/models/Endpoints";
 const router = useRouter();
 const auth = useFirebaseAuth();
 const {authUI} = useFirebaseAuthUI();
-const user = useUser();
+const user = useUser(undefined);
 
 const email = ref('');
 const password = ref('');
@@ -72,7 +72,7 @@ onMounted(() => {
         <RouterBackButton />
         <div class="row justify-center">
             <div class="column q-gutter-y-md col-8 col-lg-6 col-xl-4">
-                <q-card>
+                <q-card v-show="!user?.public">
                     <q-card-section class="text-center">
                         <span class="title non-selectable">Log In</span>
                     </q-card-section>
@@ -92,19 +92,20 @@ onMounted(() => {
                         <q-btn color="primary" @click="onLogin">Log In</q-btn>
                     </q-card-actions>
                 </q-card>
-                <q-card>
+                <q-card v-show="!user?.public">
                     <q-card-section class="text-center">
                         <span class="title non-selectable">Create Account</span>
                     </q-card-section>
                     <q-separator />
                     <q-card-section>
-                        <div id="firebaseui-div" v-show="!user.signedIn && !user.loading" />
+                        <div id="firebaseui-div" />
                     </q-card-section>
                 </q-card>
-                <q-skeleton v-if="user.loading" width="200px" height="50px" type="rect" />
-                <UserErrorCard v-else-if="user.signedIn"
-                               class="fit-content"
-                               message="You are already logged in!" />
+                <q-skeleton v-if="user?.loading" width="200px" height="50px" type="rect" />
+                <div v-else-if="!!user?.public" class="row justify-center">
+                    <UserErrorCard class="fit-content"
+                                   message="You are already logged in!" />
+                </div>
             </div>
         </div>
     </div>

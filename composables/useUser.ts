@@ -52,12 +52,15 @@ function useUser(uid : string | ComputedRef<string>, callback = (user) => {}) {
                         createSnapshot(newUser?.uid);
                     } else {
                         // no user
-                        user.data = null;
+                        user.public = null;
+                        user.private = null;
+                        user.list = null;
                         user.uid = null;
+                        user.loading = false;
                     }
 
                     if (callback) {
-                        callback(user);
+                        callback(newUser);
                     }
                 });
             }

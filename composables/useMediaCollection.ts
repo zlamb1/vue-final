@@ -101,7 +101,7 @@ export default function useMediaCollection(uid: computed, onError = (err: Error)
         } else {
             useUser(undefined, (user) => {
                 unsubscribe();
-                if (user.uid) {
+                if (user?.uid) {
                     const docRef = doc(collection(db, 'lists'), user.uid).withConverter(mediaConverter);
                     unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
                 }
