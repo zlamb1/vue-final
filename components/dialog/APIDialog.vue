@@ -1,9 +1,11 @@
 <script setup>
-import {mapArray} from '~/models/Book'
 import useGoogleBookApi from "~/composables/useGoogleBookApi";
 import APIBookCard from "~/components/card/APIBookCard.vue";
 import APISongCard from "~/components/card/APISongCard.vue";
 import SkeletonCard from "~/components/card/SkeletonCard.vue";
+import {Media} from "~/models/Media";
+import Book from '~/models/Book'
+import Song from '~/models/Song'
 
 const {qDark} = useDarkTheme();
 
@@ -20,8 +22,21 @@ const search = ref('');
 const awaitingFetch = ref(false);
 const maxResults = ref(10);
 
+const cardCount = {
+    xs: 1,
+    sm: 4,
+    md: 6,
+    lg: 12,
+    xl: 18,
+}
+
+const nextMorphStep = {
+    btn: 'menu',
+    menu: 'btn',
+}
+
 const props = defineProps({
-    mediaItems: {
+    existingItems: {
         type: Array,
         default: [],
     },
@@ -73,10 +88,40 @@ async function onSearch() {
     }
 }
 
-const nextMorphStep = {
-    btn: 'menu',
-    menu: 'btn',
+const {notifyNegative} = useNotify();
+function onImport(rawItem) {
+    let media = undefined;
+    if (rawItem?.volumeInfo) {
+        media = Book.ConvertFromGoogleBookAPI(rawItem);
+    } else {
+        media = Song.ConvertFromITunesAPI(rawItem);
+    }
+    if (!media) {
+        notifyNegative('Error occurred while importing: invalid api object');
+        return;
+    }
+    const mediaItem = new Media(media);
+    emit('import', mediaItem);
 }
+
+function doesMediaExist(mediaItem) {
+    const volumeInfo = mediaItem?.volumeInfo;
+    for (let i = 0; i < props.existingItems?.length; i++) {
+        const media = props.existingItems[i]?.media;
+        if (volumeInfo) {
+            if (mediaItem?.id === media?.googleBooksId) {
+                return true;
+            }
+        } else {
+            if (mediaItem?.trackId === media?.trackId) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 function nextMorph() {
     morphGroupModel.value = nextMorphStep[morphGroupModel.value]
 }
@@ -89,15 +134,13 @@ watch(maxResults, (newVal) => {
     maxResults.value = Math.max(Math.min(newVal, computedLimit.value), 1);
 });
 
-const s = ref(true);
-
 defineExpose({show});
 </script>
 
 <template>
     <q-dialog class="relative-position" ref="dialog" @show="onShow" maximized>
-        <div class="absolute-left menu" v-morph:menu:apigroup:200.tween.resize="morphGroupModel">
-            <div class="row justify-end q-py-md">
+        <div class="absolute-left menu" v-morph:menu:apigroup:200.resize="morphGroupModel">
+            <div class="row justify-end q-pa-md">
                 <q-btn icon="menu" @click="nextMorph" flat />
             </div>
             <div class="column  q-gutter-y-sm q-mx-md">
@@ -114,22 +157,22 @@ defineExpose({show});
             </div>
         </div>
         <q-card class="column no-wrap">
-            <q-card-section class="row no-wrap q-pa-sm relative-position" :class="qDark ? 'text-white' : 'text-primary'">
-                <div class="col">
-                    <q-btn class="q-ma-md" v-morph:btn:apigroup:200.tween.resize="morphGroupModel" @click="nextMorph" icon="menu" flat />
+            <q-card-section class="row q-pa-sm relative-position" :class="qDark ? 'text-white' : 'text-primary'">
+                <div class="col-12 col-sm-1">
+                    <q-btn class="q-mx-md" v-morph:btn:apigroup:200.resize="morphGroupModel" @click="nextMorph" icon="menu" flat />
                 </div>
-                <div class="col-11 row justify-center items-center">
+                <div class="col-10 row justify-center items-center">
                     <q-icon class="on-left" name="library_books" size="md" />
                     <span class="non-selectable" style="font-size: 20px;">Search for Media</span>
                 </div>
-                <div class="col row items-center">
+                <div class="col-1 row items-center">
                     <q-btn icon="close" class="q-ml-auto q-mr-md" flat v-close-popup />
                 </div>
             </q-card-section>
             <q-separator />
             <q-card-section class="row">
-                <div class="row justify-center q-gutter-x-md full-width">
-                    <q-input class="col-8 col-md-6 col-xl-4"
+                <div class="row justify-center q-gutter-md full-width">
+                    <q-input class="col-10 col-sm-8 col-md-6 col-lg-4 col-xl-3"
                              :color="qDark ? 'white' : 'primary'"
                              label="Search"
                              type="search"
@@ -146,7 +189,7 @@ defineExpose({show});
                             <q-btn icon="search" @click="onSearch" round flat />
                         </template>
                     </q-input>
-                    <q-input class="col-3 col-md-2"
+                    <q-input class="col-10 col-sm-2"
                              :color="qDark ? 'white' : 'primary'"
                              :label="`Max Results (1-${computedLimit})`"
                              type="number"
@@ -168,12 +211,15 @@ defineExpose({show});
                 </span>
                 <transition-group name="list" tag="div" class="row justify-center q-gutter-y-md" appear>
                     <div class="col-12 col-md-6 col-lg-4" v-for="item in mediaItems" :key="item.id ?? item.trackId">
-                        <APIBookCard v-if="item?.volumeInfo" class="full-height q-mx-sm" :book="item" />
-                        <APISongCard v-else class="full-height q-mx-sm" :song="item" />
+                        <component class="full-height q-mx-sm"
+                                   :is="item?.volumeInfo ? APIBookCard : APISongCard"
+                                   :item="item"
+                                   :removable="doesMediaExist(item)"
+                                   @add="onImport" />
                     </div>
                 </transition-group>
                 <div v-if="mediaItems.length === 0 && !awaitingFetch" class="row full-width justify-center q-mt-lg">
-                    <div v-for="i in 12" class="col-6 col-md-4 col-lg-3 col-xl-2 row justify-center q-px-sm">
+                    <div v-for="i in cardCount[$q.screen.name]" class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 row justify-center q-px-sm">
                         <div class="full-width q-my-sm">
                             <SkeletonCard class="full-width" />
                         </div>

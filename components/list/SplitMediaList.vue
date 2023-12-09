@@ -50,10 +50,6 @@ const computedList = computed(() => {
    return props.mediaCollection.filter((mediaItem) => mediaItem?.media?.title?.includes(search.value));
 });
 
-const computedBooks = computed(() => {
-    return props.mediaCollection.filter((mediaItem) => mediaItem?.type === MediaType.Book);
-});
-
 const computedScrollUp = computed(() => {
     return listScrollArea.value?.getScrollPercentage().top >= 0.95;
 });
@@ -61,10 +57,6 @@ const computedScrollUp = computed(() => {
 const computedShowContent = computed(() => {
     return !(morphGroupModel.value === 'menu' && $q.screen.lt.md);
 });
-
-const computedMiddleSection = computed(() => {
-    return $q.screen.lg;
-})
 
 const nextMorphStep = {
     menu: 'btn',
@@ -136,7 +128,7 @@ onBeforeRouteUpdate(() => {
                 </q-item>
             </q-list>
         </confirmation-dialog>
-        <APIDialog :books="computedBooks" ref="apiDialog" />
+        <APIDialog :existing-items="mediaCollection" @import="(item) => emit('add-media', item)" ref="apiDialog" />
         <div v-morph:menu:group:200.tween.resize="morphGroupModel"
              class="col-12 col-md-3 col-lg-2 left">
             <q-scroll-area style="height: 100%;" ref="listScrollArea">

@@ -1,13 +1,12 @@
 import type {SnapshotOptions} from 'firebase/firestore';
-import {collection, doc, onSnapshot, QueryDocumentSnapshot, QuerySnapshot} from "firebase/firestore";
+import {collection, doc, onSnapshot, QueryDocumentSnapshot} from "firebase/firestore";
 import {Media, MediaType} from "~/models/Media";
 import Book from "~/models/Book";
 import Movie from "~/models/Movie";
+import Song from "~/models/Song";
 import MediaCollection from "~/models/MediaCollection";
 import APIEndpoints from "~/models/Endpoints";
 import UpdateAction from "~/models/UpdateAction";
-import {FirebaseError} from "@firebase/app";
-import {Exception} from "sass";
 
 const mediaConverter = {
     toFirestore(collection: Media[]) : Object {
@@ -34,6 +33,9 @@ const mediaConverter = {
                         break;
                     case MediaType.Movie:
                         media = Object.assign(new Movie(), mediaObject);
+                        break;
+                    case MediaType.Song:
+                        media = Object.assign(new Song(), mediaObject);
                         break;
                 }
                 array.push(new Media(media));

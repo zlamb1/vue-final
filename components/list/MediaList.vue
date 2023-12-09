@@ -175,9 +175,7 @@ function onEditDialogSubmit(mediaItem) {
 }
 
 function onImportBook(item) {
-    const book = Book.ConvertFromGoogleBookAPI(item);
-    const mediaItem = new Media(book);
-    emit('add-media', mediaItem)
+    emit('add-media', item);
 }
 
 function onRemoveImport(book) {

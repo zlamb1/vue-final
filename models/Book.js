@@ -37,9 +37,7 @@ export default class Book {
         const volumeInfo = book?.volumeInfo;
         const newBook = new Book(volumeInfo?.title, volumeInfo?.authors, 1, volumeInfo?.pageCount, 3, this.CoverType.Paperback,
             volumeInfo?.imageLinks?.thumbnail, false);
-        if (volumeInfo?.industryIdentifiers) {
-            newBook.isbn = volumeInfo?.industryIdentifiers;
-        }
+        newBook.googleBooksId = book?.id;
         return newBook;
     }
     

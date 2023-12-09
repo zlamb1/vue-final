@@ -1,6 +1,7 @@
 const MediaType = Object.freeze(Object.defineProperty({
     Book: 'Book',
     Movie: 'Movie',
+    Song: 'Song',
     Default: 'Book',
 }, 'Default', {
     enumerable: false,

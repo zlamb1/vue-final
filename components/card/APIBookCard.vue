@@ -2,11 +2,17 @@
 import {mapArray} from "~/models/Book";
 
 defineProps({
-    book: {
+    item: {
         type: Object,
         required: true,
-    }
+    },
+    removable: {
+        type: Boolean,
+        default: false,
+    },
 });
+
+const emit = defineEmits(['add', 'remove', 'hide']);
 
 const descDialog = ref(null);
 
@@ -22,8 +28,8 @@ function trimDescription(desc) {
     }
 }
 
-function showDescDialog(book) {
-    selectedItem.value = book;
+function showDescDialog(item) {
+    selectedItem.value = item;
     descDialog.value?.show();
 }
 </script>
@@ -46,31 +52,31 @@ function showDescDialog(book) {
             <q-card-section class="full-height" horizontal>
                 <q-card-section class="column fit q-pa-none">
                     <q-card-section class="text-center title">
-                        {{book.volumeInfo?.title}} by
-                        {{mapArray(book.volumeInfo?.authors)}}
+                        {{item?.volumeInfo?.title}} by
+                        {{mapArray(item?.volumeInfo?.authors)}}
                     </q-card-section>
                     <q-separator />
                     <q-card-section>
-                        <q-btn v-if="book.volumeInfo?.description"
+                        <q-btn v-if="item?.volumeInfo?.description"
                                padding="0"
-                               @click="showDescDialog(book)"
+                               @click="showDescDialog(item)"
                                flat no-caps>
                             Description:
-                            {{trimDescription(book.volumeInfo?.description)}}
+                            {{trimDescription(item.volumeInfo?.description)}}
                         </q-btn>
                     </q-card-section>
                     <q-card-section class="row q-mt-auto">
-                        <q-btn color="red" icon="remove" round>
-                            <q-tooltip class="bg-red-8">
-                                Remove from media list
-                            </q-tooltip>
-                        </q-btn>
-                        <q-btn color="green" icon="add" round>
+                        <q-btn v-if="!removable" color="green" icon="add" @click="emit('add', item)" round>
                             <q-tooltip class="bg-green-8">
                                 Add to media list
                             </q-tooltip>
                         </q-btn>
-                        <q-btn class="q-ml-auto" icon="visibility" round>
+                        <q-btn v-else color="red" icon="remove" @click="emit('remove', item)" round>
+                            <q-tooltip class="bg-red-8">
+                                Remove from media list
+                            </q-tooltip>
+                        </q-btn>
+                        <q-btn class="q-ml-auto" icon="visibility" @click="emit('hide', item)" round>
                             <q-tooltip class="bg-primary">
                                 Hide
                             </q-tooltip>
@@ -78,8 +84,8 @@ function showDescDialog(book) {
                     </q-card-section>
                 </q-card-section>
                 <q-separator vertical />
-                <q-card-section v-if="book.volumeInfo?.imageLinks?.thumbnail" class="row justify-center items-center fit">
-                    <q-img fit="cover" :src="book.volumeInfo?.imageLinks?.thumbnail" :img-style="{imageRendering: 'high-quality'}" />
+                <q-card-section v-if="item.volumeInfo?.imageLinks?.thumbnail" class="row justify-center items-center fit">
+                    <q-img fit="cover" :src="item.volumeInfo?.imageLinks?.thumbnail" :img-style="{imageRendering: 'high-quality'}" />
                 </q-card-section>
             </q-card-section>
         </q-card>
