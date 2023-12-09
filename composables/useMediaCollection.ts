@@ -7,6 +7,7 @@ import Song from "~/models/Song";
 import MediaCollection from "~/models/MediaCollection";
 import APIEndpoints from "~/models/Endpoints";
 import UpdateAction from "~/models/UpdateAction";
+import MediaFactory from "~/models/factory/MediaFactory";
 
 const mediaConverter = {
     toFirestore(collection: Media[]) : Object {
@@ -26,18 +27,7 @@ const mediaConverter = {
             const array = [];
             for (const key in list) {
                 const mediaObject = list[key];
-                let media: any = {type: MediaType.Default};
-                switch (mediaObject.type) {
-                    case MediaType.Book:
-                        media = Object.assign(new Book(), mediaObject);
-                        break;
-                    case MediaType.Movie:
-                        media = Object.assign(new Movie(), mediaObject);
-                        break;
-                    case MediaType.Song:
-                        media = Object.assign(new Song(), mediaObject);
-                        break;
-                }
+                const media = Object.assign(MediaFactory.CreateMediaInstance(mediaObject.type), mediaObject);
                 array.push(new Media(media));
             }
             return MediaCollection(array);

@@ -15,15 +15,18 @@ import SongForm from "~/components/form/SongForm.vue";
 
 export default class MediaFactory {
     static CreateInstance(type) {
+        return new Media(this.CreateMediaInstance(type));
+    }
+    static CreateMediaInstance(type) {
         switch (type) {
             case MediaType.Book:
-                return new Media(new Book());
+                return new Book();
             case MediaType.Movie:
-                return new Media(new Movie());
+                return new Movie();
             case MediaType.Song:
-                return new Media(new Song());
+                return new Song();
             default:
-                return new Media(new Book());
+                return new Book();
         }
     }
     static CreateInfo(type) {
