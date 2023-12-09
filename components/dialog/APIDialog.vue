@@ -15,6 +15,7 @@ const searchInput = ref(null);
 
 const apiSelected = ref('google_books');
 const mediaItems = ref([]);
+const page = ref(1);
 const totalItemsReturned = ref(0);
 const totalItems = ref(0);
 const searchPerformed = ref(false);
@@ -69,11 +70,16 @@ const computedLimit = computed(() => {
     }
 });
 
+async function onRefresh(done) {
+    await onSearch();
+    done();
+}
+
 async function onSearch() {
     if (search.value) {
         awaitingFetch.value = true;
         const queryFn = apiSelected.value === 'google_books' ? googleBooksApi.queryApi : iTunesApi.queryApi;
-        const {items, count, totalCount} = await queryFn(search.value, maxResults.value) || {};
+        const {items, count, totalCount} = await queryFn(search.value, maxResults.value, (page.value - 1) * maxResults.value) || {};
         if (items) {
             mediaItems.value = items;
             totalItemsReturned.value = count;
@@ -137,6 +143,12 @@ function nextMorph() {
     morphGroupModel.value = nextMorphStep[morphGroupModel.value]
 }
 
+function closeMenu() {
+    if (morphGroupModel.value === 'menu') {
+        nextMorph();
+    }
+}
+
 function show() {
     dialog.value?.show();
 }
@@ -145,16 +157,29 @@ watch(maxResults, (newVal) => {
     maxResults.value = Math.max(Math.min(newVal, computedLimit.value), 1);
 });
 
+watch(search, () => {
+    page.value = 1;
+});
+
+watch(maxResults, () => {
+    page.value = 1;
+    onSearch();
+});
+
+watch(page, () => {
+   onSearch();
+});
+
 defineExpose({show});
 </script>
 
 <template>
     <q-dialog class="relative-position" ref="dialog" @show="onShow" maximized>
-        <div class="absolute-left menu" v-morph:menu:apigroup:200.resize="morphGroupModel">
-            <div class="row justify-end q-pa-md">
+        <div class="absolute-left menu column q-gutter-y-md q-pa-md" v-morph:menu:apigroup:200.resize="morphGroupModel">
+            <div class="row q-ml-auto">
                 <q-btn icon="menu" @click="nextMorph" flat />
             </div>
-            <div class="column  q-gutter-y-sm q-mx-md">
+            <div class="column q-gutter-y-sm q-mx-md">
                 <q-btn :color="apiSelected === 'google_books' ? 'primary' : undefined"
                        label="Google Books"
                        icon="auto_stories"
@@ -167,10 +192,10 @@ defineExpose({show});
                        push />
             </div>
         </div>
-        <q-card class="column no-wrap">
+        <q-card class="column no-wrap" @click="closeMenu">
             <q-card-section class="row q-pa-sm relative-position" :class="qDark ? 'text-white' : 'text-primary'">
                 <div class="col-12 col-sm-1">
-                    <q-btn class="q-mx-md" v-morph:btn:apigroup:200.resize="morphGroupModel" @click="nextMorph" icon="menu" flat />
+                    <q-btn class="q-mx-md" v-morph:btn:apigroup:200.resize="morphGroupModel" @click.stop="nextMorph" icon="menu" flat />
                 </div>
                 <div class="col-10 row justify-center items-center">
                     <q-icon class="on-left" name="library_books" size="md" />
@@ -182,7 +207,7 @@ defineExpose({show});
             </q-card-section>
             <q-separator />
             <q-card-section class="row">
-                <div class="row justify-center q-gutter-md full-width">
+                <div class="row justify-center items-center q-gutter-md full-width">
                     <q-input class="col-10 col-sm-8 col-md-6 col-lg-4 col-xl-3"
                              :color="qDark ? 'white' : 'primary'"
                              label="Search"
@@ -195,9 +220,14 @@ defineExpose({show});
                         <template #append>
                             <q-spinner-dots class="on-right" v-show="awaitingFetch" />
                             <div v-if="search">
-                                <q-btn icon="cancel" @click="() => { search = ''; onSearch(); }" round flat />
+                                <q-btn icon="cancel" color="primary" @click="() => { search = ''; onSearch(); }" round flat />
                             </div>
-                            <q-btn icon="search" @click="onSearch" round flat />
+                            <q-icon color="primary" name="info">
+                                <q-tooltip class="bg-primary text-white">
+                                    Search Google Book API or iTunes API for media to add to your media list.
+                                </q-tooltip>
+                            </q-icon>
+                            <q-btn color="primary" icon="search" @click="onSearch" round flat />
                         </template>
                     </q-input>
                     <q-input class="col-10 col-sm-2"
@@ -210,9 +240,21 @@ defineExpose({show});
                 </div>
             </q-card-section>
             <q-card-section class="column q-pt-none" style="flex: 1;">
-                <div v-if="mediaItems.length > 0" class="row q-gutter-md text-grey-6 q-mb-sm">
-                    <span>Items returned: {{totalItemsReturned}}</span>
-                    <span v-show="totalItemsReturned !== totalItems">Total items: {{totalItems}}</span>
+                <div class="row text-grey-6">
+                    <div v-if="mediaItems.length > 0" class="col-12 col-sm-3 row items-center q-gutter-x-md non-selectable">
+                        <span>Items returned: {{totalItemsReturned}}</span>
+                        <span v-show="totalItemsReturned !== totalItems">Total items: {{totalItems}}</span>
+                    </div>
+                    <div v-if="totalItems > 0" class="col row justify-center items-center full-height">
+                        <q-pagination
+                            v-model="page"
+                            :max="totalItems / maxResults"
+                            :max-pages="5"
+                            color="grey"
+                            active-color="primary"
+                            input flat />
+                    </div>
+                    <div v-if="mediaItems.length > 0" class="col-0 col-sm-3" />
                 </div>
                 <span v-if="mediaItems.length < 1 && !awaitingFetch" class="column q-mt-md text-center text-grey-7">
                     No results...
@@ -220,16 +262,18 @@ defineExpose({show});
                         {{computedNoResultsText}}
                     </span>
                 </span>
-                <transition-group name="list" tag="div" class="row justify-center q-gutter-y-md" appear>
-                    <div class="col-12 col-md-6 col-lg-4" v-for="item in mediaItems" :key="item.id ?? item.trackId">
-                        <component class="full-height q-mx-sm"
-                                   :is="item?.volumeInfo ? APIBookCard : APISongCard"
-                                   :item="item"
-                                   :removable="!!findExistingItem(item)"
-                                   @add="onImport"
-                                   @remove="onRemove" />
-                    </div>
-                </transition-group>
+                <q-pull-to-refresh @refresh="onRefresh">
+                    <transition-group name="list" tag="div" class="row justify-center q-gutter-y-md" appear>
+                        <div class="col-12 col-md-6 col-lg-4" v-for="item in mediaItems" :key="item.id ?? item.trackId">
+                            <component class="full-height q-mx-sm"
+                                       :is="item?.volumeInfo ? APIBookCard : APISongCard"
+                                       :item="item"
+                                       :removable="!!findExistingItem(item)"
+                                       @add="onImport"
+                                       @remove="onRemove" />
+                        </div>
+                    </transition-group>
+                </q-pull-to-refresh>
                 <div v-if="mediaItems.length === 0 && !awaitingFetch" class="row full-width justify-center q-mt-lg">
                     <div v-for="i in cardCount[$q.screen.name]" class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 row justify-center q-px-sm">
                         <div class="full-width q-my-sm">
