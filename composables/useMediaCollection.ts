@@ -43,7 +43,7 @@ export default function useMediaCollection(uid: computed, onError = (err: Error)
     let unsubscribe = () => {}
 
     mediaCollection.dbAdd = async (media: Media) => {
-        const idToken = await useUserToken();
+        const idToken = uid?.value === 'global' ? 'global' : await useUserToken();
         const response = await useFetch(APIEndpoints.UPDATE_LIST, {
             query: {
                 idToken: idToken,
@@ -56,7 +56,7 @@ export default function useMediaCollection(uid: computed, onError = (err: Error)
     };
 
     mediaCollection.dbUpdate = async (media: Media) => {
-        const idToken = await useUserToken();
+        const idToken = uid?.value === 'global' ? 'global' : await useUserToken();
         const response = await useFetch(APIEndpoints.UPDATE_LIST, {
             query: {
                 idToken: idToken,
@@ -69,7 +69,7 @@ export default function useMediaCollection(uid: computed, onError = (err: Error)
     }
 
     mediaCollection.dbRemove = async(media: Media) => {
-        const idToken = await useUserToken();
+        const idToken = uid?.value === 'global' ? 'global' : await useUserToken();
         const response = await useFetch(APIEndpoints.UPDATE_LIST, {
             query: {
                 idToken: idToken,

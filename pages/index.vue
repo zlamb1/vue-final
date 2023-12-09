@@ -30,7 +30,7 @@ const showBackToTopBtn = ref(false);
 const mediaList = ref(null);
 
 const computedAllowEdits = computed(() => {
-    return !Boolean(route.query.id);
+    return !Boolean(route?.query?.id) || route?.query?.id === 'global';
 })
 
 function onClickGlobal() {

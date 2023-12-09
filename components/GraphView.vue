@@ -4,9 +4,14 @@ import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, Li
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
+const route = useRoute();
 const {qDark} = useDarkTheme();
 
-const user = useUser(undefined);
+const computedUID = computed(() => {
+   return route?.query?.id;
+});
+
+const user = useUser(computedUID);
 
 const chart = ref(null);
 
