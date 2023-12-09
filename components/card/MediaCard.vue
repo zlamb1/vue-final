@@ -165,7 +165,8 @@ onMounted(() => {
                                       :media="media.media"
                                       @pointerdown.stop
                                       @mousedown.stop
-                                      @edit="$emit('open-edit')">
+                                      @edit="$emit('open-edit')"
+                                      @favorite="$emit('update')">
                             <template #prepend>
                                 <q-btn class="on-left"
                                        icon="pan_tool"
