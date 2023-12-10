@@ -121,7 +121,7 @@ watch(user, () => {
                     <q-card-section class="column full-width q-gutter-y-md q-pt-none q-mt-none">
                         <q-editor v-if="isPersonalProfile" v-model="bio" placeholder="Profile Bio" />
                         <div v-else>
-                            <q-expansion-item style="font-size: 16px; border-radius: 15px;"
+                            <q-expansion-item style="font-size: 16px"
                                               label="Profile Bio"
                                               class="shadow-1 overflow-hidden"
                                               header-class="bg-accent text-white"
