@@ -3,4 +3,5 @@ export default class APIEndpoints {
     static UPDATE_USER = 'api/update-user';
     static DELETE_USER = 'api/delete-user';
     static UPDATE_LIST = 'api/update-list';
+    static GET_USERS = `api/get-users`;
 }

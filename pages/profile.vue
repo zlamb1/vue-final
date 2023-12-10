@@ -82,13 +82,13 @@ const saveChanges = async () => {
     }
 }
 
-watch(user, (newUser) => {
-    if (user.public) {
-        displayName.value = newUser?.public?.displayName;
-        photoURL.value = newUser?.public?.photoURL;
+watch(user, () => {
+    if (user?.public) {
+        displayName.value = user?.public?.displayName;
+        photoURL.value = user?.public?.photoURL;
     }
-    if (user.private) {
-        bio.value = newUser?.private?.bio;
+    if (user?.private) {
+        bio.value = user?.private?.bio;
     }
 });
 </script>
@@ -98,8 +98,8 @@ watch(user, (newUser) => {
         <RouterBackButton />
         <div class="row justify-center items-center">
             <div class="col-8 col-md-6 col-lg-4">
-                <q-skeleton v-if="user.loading" type="rect" class="full-width" height="200px" />
-                <q-card v-else-if="user.public"
+                <q-skeleton v-if="user?.loading" type="rect" class="full-width" height="200px" />
+                <q-card v-else-if="user?.public"
                         class="column items-center q-gutter-y-lg full-width"
                         :flat="qDark" :bordered="qDark">
                     <q-card-section class="row justify-center items-center q-mt-none q-pa-md">

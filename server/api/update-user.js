@@ -31,13 +31,21 @@ export default defineEventHandler(async (event) => {
     return await useUserToken(event).then(async (user) => {
         const {displayName, photoURL, bio, profileVisibility, listVisibility, targetUser} = getQuery(event);
         
+        let targetUID = user.uid;
         if (targetUser) {
-            // TODO: validate permissions and update target profile
+            const privateDocRef = firestore.doc(`users/${user.uid}/private/data`);
+            const privateDoc = await privateDocRef.get();
+            const privateData = privateDoc.data();
+            if (!privateData?.roles?.admin) {
+                return ResponseCode.NO_PERMS;
+            } else {
+                targetUID = targetUser;
+            }
         }
         
-        const publicDocRef = firestore.doc(`users/${user.uid}`);
+        const publicDocRef = firestore.doc(`users/${targetUID}`);
         const publicDoc = await publicDocRef.get();
-        const privateDocRef = firestore.doc(`users/${user.uid}/private/data`);
+        const privateDocRef = firestore.doc(`users/${targetUID}/private/data`);
         const privateDoc = await privateDocRef.get();
         
         if (!publicDoc.exists || !privateDoc.exists) {

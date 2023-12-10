@@ -34,8 +34,8 @@ onSnapshot(publicDocRef, (_doc) => {
     <div>
         <RouterBackButton />
         <div class="column items-center">
-            <span class="title non-selectable">Other Users</span>
-            <div class="row justify-center q-my-md full-width">
+            <span class="title text-primary non-selectable">View Other Media Lists</span>
+            <div class="row justify-center q-my-md full-width" v-if="users.length > 0">
                 <q-input class="col-3" placeholder="Search by Display Name" v-model="search" filled>
                     <template #append>
                         <q-btn v-show="search" icon="cancel" @click="search = ''" flat round />
@@ -63,7 +63,7 @@ onSnapshot(publicDocRef, (_doc) => {
                     </template>
                 </UserCard>
             </div>
-            <UserErrorCard v-else message="No public media lists available!" />
+            <UserErrorCard v-else class="q-mt-md" message="No public media lists available!" />
         </transition-group>
     </div>
 </template>

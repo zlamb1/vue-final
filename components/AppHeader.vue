@@ -8,6 +8,10 @@ const {qDark} = useDarkTheme();
 const computedColor = computed(() => {
     return qDark.value ? 'white' : 'primary';
 });
+
+const isAdmin = computed(() => {
+    return user?.private?.roles?.admin;
+});
 </script>
 
 <template>
@@ -53,6 +57,16 @@ const computedColor = computed(() => {
                                     <q-item-section>Browse Lists</q-item-section>
                                     <q-item-section avatar>
                                         <q-icon class="icon" size="sm" name="list" />
+                                    </q-item-section>
+                                </q-item>
+                                <q-item v-if="isAdmin"
+                                        class="bg-accent row justify-between"
+                                        to="/users"
+                                        clickable
+                                        v-close-popup>
+                                    <q-item-section>Browse Users</q-item-section>
+                                    <q-item-section avatar>
+                                        <q-icon class="icon" size="sm" name="admin_panel_settings" />
                                     </q-item-section>
                                 </q-item>
                                 <q-item class="bg-accent row justify-between"
