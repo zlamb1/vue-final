@@ -5,9 +5,9 @@ import ResponseCode from "~/models/ResponseCode";
 export default defineEventHandler(async (event) => {
     return await useUserToken(event).then((user) => {
         const uid = user.uid;
-        const publicDocRef = firestore.doc(`users/${uid}`);
-        const privateDocRef = firestore.doc(`users/${uid}/private/data`);
-        return publicDocRef.get()
+        const userDocRef = firestore.doc(`users/${uid}`);
+        const privateUserDocRef = firestore.doc(`users/${uid}/private/data`);
+        return userDocRef.get()
             .then(async (doc) => {
                 if (!doc.exists) {
                     return ResponseCode.NO_USER;
@@ -20,8 +20,8 @@ export default defineEventHandler(async (event) => {
                     users: FieldValue.arrayRemove(uid),
                 })
                 // delete user docs
-                await publicDocRef.delete();
-                await privateDocRef.delete();
+                await privateUserDocRef.delete();
+                await userDocRef.delete();
                 // delete auth user
                 await auth.deleteUser(uid);
                 return ResponseCode.SUCCESS;

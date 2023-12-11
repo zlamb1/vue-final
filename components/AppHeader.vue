@@ -64,11 +64,12 @@ const isAdmin = computed(() => {
                                         to="/users"
                                         clickable
                                         v-close-popup>
-                                    <q-item-section>Browse Users</q-item-section>
+                                    <q-item-section class="no-wrap">Browse Users</q-item-section>
                                     <q-item-section avatar>
                                         <q-icon class="icon" size="sm" name="admin_panel_settings" />
                                     </q-item-section>
                                 </q-item>
+                                <q-separator />
                                 <q-item class="bg-accent row justify-between"
                                         to="/settings"
                                         clickable
@@ -78,7 +79,6 @@ const isAdmin = computed(() => {
                                         <q-icon class="icon" size="sm" name="settings" />
                                     </q-item-section>
                                 </q-item>
-                                <q-separator />
                                 <q-item class="bg-accent"
                                         @click="signOutUser"
                                         clickable

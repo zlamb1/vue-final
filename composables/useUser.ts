@@ -123,13 +123,8 @@ async function deleteUser() {
     const auth = useFirebaseAuth();
     if (auth.currentUser) {
         const idToken = await useUserToken();
-        // TODO: handle other providers
-        const provider = new GoogleAuthProvider();
-        // reauthenticate user
-        return reauthenticateWithPopup(auth.currentUser, provider).then(async () => {
-            return useFetch(APIEndpoints.DELETE_USER, {
-                query: {idToken}
-            });
+        return useFetch(APIEndpoints.DELETE_USER, {
+            query: {idToken}
         });
     }
 }
