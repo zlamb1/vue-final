@@ -1,6 +1,8 @@
 <script setup>
 import AddMediaButton from "~/components/button/AddMediaButton.vue";
 
+const {qDark} = useDarkTheme();
+
 const props = defineProps({
     tableTitle: {
         type: String,
@@ -36,24 +38,25 @@ function onSearch() {
             </div>
             <slot></slot>
             <q-space />
-            <add-media-button v-if="allowEdits" @click="emit('add', item);" />
+            <add-media-button v-if="allowEdits" @click="(item) => emit('add', item)" />
             <q-btn v-if="allowEdits"
                    class="state-btn text-caption text-bold"
                    color="red"
                    :label="selected.length > 1 ? 'Delete Items' : 'Delete Item'"
                    v-show="selected.length > 0"
-                   @click="emit('click-delete')"
+                   @click="emit('delete')"
                    stretch />
             <q-btn
                 icon="fullscreen"
                 v-show="!showGridView"
-                @click="emit('toggle-fullscreen')" />
+                @click="emit('fullscreen')" />
         </div>
         <div>
             <q-input v-model="search"
                      class="fit-content"
                      label="Search by Title"
                      type="search"
+                     :color="qDark ? 'white' : 'primary'"
                      @update:model-value="onSearch"
                      filled dense>
                 <template #append>

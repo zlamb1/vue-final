@@ -126,12 +126,12 @@ const computedSelectAll = computed({
     }
 });
 
-function onClickAddBtn(mediaType) {
-    if (mediaType === 'import') {
+function onClickAddBtn(type) {
+    if (type === 'import') {
         apiDialog.value?.show();
         return;
     }
-    newMediaItem.value = MediaFactory.CreateInstance(mediaType);
+    newMediaItem.value = MediaFactory.CreateInstance(type);
     addDialog.value?.open();
 }
 

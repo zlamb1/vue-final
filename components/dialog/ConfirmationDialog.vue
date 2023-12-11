@@ -1,4 +1,6 @@
 <script setup>
+const {qDark} = useDarkTheme();
+
 const props = defineProps({
     showId: {
         type: String,
@@ -48,12 +50,13 @@ defineExpose({open, hide});
             </q-card-section>
             <q-card-actions align="right">
                 <q-btn label="Cancel"
-                       color="primary"
                        class="text-bold btn-action"
+                       :color="qDark ? 'white' : 'primary'"
                        flat v-close-popup />
-                <q-btn :label="btnText"
-                       :color="btnColor"
-                       class="text-bold btn-action"
+                <q-btn class="text-bold btn-action"
+                       :label="btnText"
+                       :color="qDark ? 'white' : btnColor"
+                       :text-color="qDark ? 'primary' : 'white'"
                        @click="onConfirm"
                        v-close-popup />
             </q-card-actions>

@@ -112,11 +112,17 @@ const setChartTheme = () => {
 onMounted(() => {
     setTimeout(() => {
         setChartTheme();
-    }, 100);
+    }, 25);
 })
 
 watch(qDark, () => {
     setChartTheme();
+});
+
+onBeforeRouteUpdate(() => {
+    setTimeout(() => {
+        setChartTheme();
+    }, 25);
 });
 </script>
 

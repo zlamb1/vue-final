@@ -6,6 +6,7 @@ import APIEndpoints from "~/models/Endpoints";
 import ResponseCode from "~/models/ResponseCode";
 
 const router = useRouter();
+const {qDark} = useDarkTheme();
 
 const loading = ref(false);
 const users = ref([]);
@@ -127,8 +128,8 @@ const onOpenDialog = (user) => {
                     <q-editor v-model="selectedUser.bio" />
                 </q-card-section>
                 <q-card-actions class="float-right">
-                    <q-btn style="width: 100px" icon="cancel" label="Cancel" flat v-close-popup />
-                    <q-btn style="width: 100px"  icon="edit" label="Save" color="blue-8" @click="updateUserData(selectedUser)" v-close-popup />
+                    <q-btn style="width: 100px" label="Cancel" flat v-close-popup />
+                    <q-btn style="width: 100px" label="Save" color="blue-8" @click="updateUserData(selectedUser)" v-close-popup />
                 </q-card-actions>
             </q-card>
         </q-dialog>
@@ -139,7 +140,8 @@ const onOpenDialog = (user) => {
                         <template #body-cell="scope">
                             <q-td>
                                 <span>
-                                    {{scope.row[scope.col.field]}}
+                                    <span v-if="scope.row[scope.col.field]">{{scope.row[scope.col.field]}}</span>
+                                    <span v-else class="text-red-8">Undefined</span>
                                     <DynamicPopupEdit v-model="scope.row[scope.col.field]" @save="updateUserData(scope.row)" />
                                </span>
                             </q-td>
@@ -161,12 +163,17 @@ const onOpenDialog = (user) => {
                         </template>
                         <template #bottom="scope">
                             <div class="row full-width justify-between">
-                                <q-icon color="primary" name="info" size="md">
+                                <q-icon :color="qDark ? 'white' : 'primary'" name="info" size="md">
                                     <q-tooltip class="bg-primary text-white">
                                         Pull down from the top of the table to refresh data
                                     </q-tooltip>
                                 </q-icon>
-                                <q-pagination v-model="scope.pagination.page" :max="Math.min(3, scope.pagesNumber)" direction-links boundary-links />
+                                <q-pagination v-model="scope.pagination.page"
+                                              active-text-color="white"
+                                              active-design="unelevated"
+                                              :text-color="qDark ? 'white' : 'primary'"
+                                              :max="Math.min(3, scope.pagesNumber)"
+                                              direction-links boundary-links flat />
                             </div>
                         </template>
                     </q-table>

@@ -28,7 +28,7 @@ const isAdmin = computed(() => {
             </div>
             <div class="row items-center q-gutter-x-md q-mx-md">
                 <slot></slot>
-                <div v-if="user?.loading" class="row items-center">
+                <div v-if="user?.loading || !!user?.public" class="row items-center">
                     <q-btn class="user-btn row items-center"
                            :color="computedColor"
                            size="md"

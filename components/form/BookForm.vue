@@ -44,7 +44,7 @@ defineExpose({focusFirstInput});
         ref="firstInput"
         stack-label>
     </q-input>
-    <array-input label="Author" :allow-zero-inputs="true" v-model="media.authors" max-height="200px" />
+    <array-input v-model="media.authors" label="Author" max-height="200px" class="q-mt-xl" :allow-zero-inputs="true" />
     <q-input
         class="q-py-none"
         type="number"

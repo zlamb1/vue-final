@@ -175,21 +175,25 @@ defineExpose({show});
 
 <template>
     <q-dialog class="relative-position" ref="dialog" @show="onShow" maximized>
-        <div class="absolute-left menu column q-gutter-y-md q-pa-md" v-morph:menu:apigroup:200.resize="morphGroupModel">
-            <div class="row q-ml-auto">
-                <q-btn icon="menu" @click="nextMorph" flat />
-            </div>
-            <div class="column q-gutter-y-sm q-mx-md">
-                <q-btn :color="apiSelected === 'google_books' ? 'primary' : undefined"
-                       label="Google Books"
-                       icon="auto_stories"
-                       @click="apiSelected = 'google_books'"
-                       push />
-                <q-btn :color="apiSelected === 'itunes' ? 'primary' : undefined"
-                       label="iTunes"
-                       icon="music_note"
-                       @click="apiSelected = 'itunes'"
-                       push />
+        <div class="absolute-left menu" v-morph:menu:apigroup:200.resize="morphGroupModel">
+            <div class="column q-gutter-y-md q-pa-md">
+                <div class="row q-ml-auto">
+                    <q-btn :color="qDark ? 'white' : 'primary'" icon="menu" @click="nextMorph" flat />
+                </div>
+                <div class="column q-gutter-y-sm q-mx-md">
+                    <q-btn label="Google Books"
+                           icon="auto_stories"
+                           :color="apiSelected === 'google_books' ? 'accent' : 'white'"
+                           :text-color="apiSelected === 'google_books' ? 'white' : 'primary'"
+                           @click="apiSelected = 'google_books'"
+                           push />
+                    <q-btn label="iTunes"
+                           icon="music_note"
+                           :color="apiSelected === 'itunes' ? 'accent' : 'white'"
+                           :text-color="apiSelected === 'itunes' ? 'white' : 'primary'"
+                           @click="apiSelected = 'itunes'"
+                           push />
+                </div>
             </div>
         </div>
         <q-card class="column no-wrap" @click="closeMenu">
@@ -220,22 +224,22 @@ defineExpose({show});
                         <template #append>
                             <q-spinner-dots class="on-right" v-show="awaitingFetch" />
                             <div v-if="search">
-                                <q-btn icon="cancel" color="primary" @click="() => { search = ''; onSearch(); }" round flat />
+                                <q-btn icon="cancel" :color="qDark ? 'white' : 'primary'" @click="() => { search = ''; onSearch(); }" round flat />
                             </div>
-                            <q-icon color="primary" name="info">
+                            <q-icon name="info" :color="qDark ? 'white' : 'primary'">
                                 <q-tooltip class="bg-primary text-white">
                                     Search Google Book API or iTunes API for media to add to your media list.
                                 </q-tooltip>
                             </q-icon>
-                            <q-btn color="primary" icon="search" @click="onSearch" round flat />
+                            <q-btn :color="qDark ? 'white' : 'primary'" icon="search" @click="onSearch" round flat />
                         </template>
                     </q-input>
                     <q-input class="col-10 col-sm-2"
-                             :color="qDark ? 'white' : 'primary'"
-                             :label="`Max Results (1-${computedLimit})`"
                              type="number"
                              v-model.number="maxResults"
                              min="1" :max="computedLimit"
+                             :color="qDark ? 'white' : 'primary'"
+                             :label="`Max Results (1-${computedLimit})`"
                              filled />
                 </div>
             </q-card-section>
@@ -270,7 +274,8 @@ defineExpose({show});
                                        :item="item"
                                        :removable="!!findExistingItem(item)"
                                        @add="onImport"
-                                       @remove="onRemove" />
+                                       @remove="onRemove"
+                                       @hide="mediaItems?.splice(mediaItems?.indexOf(item), 1)" />
                         </div>
                     </transition-group>
                 </q-pull-to-refresh>
@@ -290,14 +295,17 @@ defineExpose({show});
 </template>
 
 <style scoped>
-.title {
-    font-size: 16px;
-}
 .menu {
     width: fit-content;
-    height: 100%;
     z-index: 99;
     border-right: 1px solid rgba(229, 229, 229);
+}
+
+.body--light .menu {
     background: #fff !important;
+}
+
+.body--dark .menu {
+    background: var(--q-dark) !important;
 }
 </style>

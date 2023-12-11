@@ -4,6 +4,8 @@ import RouterBackButton from "~/components/button/RouterBackButton.vue";
 import UserCard from "~/components/card/UserCard.vue";
 import UserErrorCard from "~/components/card/UserErrorCard.vue";
 
+const {qDark} = useDarkTheme();
+
 const db = useFirestore();
 const publicDocRef = doc(collection(db, 'lists'), 'public');
 
@@ -34,7 +36,7 @@ onSnapshot(publicDocRef, (_doc) => {
     <div>
         <RouterBackButton />
         <div class="column items-center">
-            <span class="title text-primary non-selectable">View Other Media Lists</span>
+            <span class="title non-selectable" :class="qDark ? 'text-white' : 'text-primary'">View Other Media Lists</span>
             <div class="row justify-center q-my-md full-width" v-if="users.length > 0">
                 <q-input class="col-3" placeholder="Search by Display Name" v-model="search" filled>
                     <template #append>
