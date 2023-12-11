@@ -2,8 +2,8 @@
 Deployed at: https://vue-final.vercel.app
 
 ## Firebase Security Rules
-![image](https://github.com/zlamb1/vue-final/assets/102142742/c814d2fe-d553-49b0-a7b4-457c45fc6300)
+![image](https://github.com/zlamb1/vue-final/assets/102142742/f0630d6c-073e-46fd-999c-a74d017bc43b)
 
 ## Firestore Database Layout
-![image](https://github.com/zlamb1/vue-final/assets/102142742/d35d57ae-62f4-4cec-809d-3e9d53784c03)
-![image](https://github.com/zlamb1/vue-final/assets/102142742/c20ba7f9-dd8c-4523-bdc4-19a7e5b36677)
+![image](https://github.com/zlamb1/vue-final/assets/102142742/cc6126a5-1d86-42ce-9915-e593fa0bbe4a)
+![image](https://github.com/zlamb1/vue-final/assets/102142742/6dcf5da9-5314-40f7-8d6d-a9a813a858d3)
