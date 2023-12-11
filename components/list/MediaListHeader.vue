@@ -1,13 +1,7 @@
 <script setup>
-import FilterList from "~/components/list/FilterList.vue";
-import {MediaType} from "~/models/Media";
-import {Filter} from "~/models/Filter";
 import AddMediaButton from "~/components/button/AddMediaButton.vue";
 
-const dropdownBtn = ref(null);
-const filters = ref([]);
-
-defineProps({
+const props = defineProps({
     tableTitle: {
         type: String,
         default: '',
@@ -25,18 +19,12 @@ defineProps({
     },
 });
 
-const emit = defineEmits(['click-add', 'click-delete', 'toggle-fullscreen']);
+const search = ref('');
 
-function onAddFilter(filterString) {
-    filters.value.push(new Filter(filterString));
-}
+const emit = defineEmits(['add', 'delete', 'search', 'fullscreen']);
 
-function onRemoveFilter(filter) {
-    filters.value.splice(filters.value.indexOf(filter), 1);
-}
-
-function onClickItem(item) {
-    emit('click-add', item);
+function onSearch() {
+    emit('search', search.value);
 }
 </script>
 
@@ -48,7 +36,7 @@ function onClickItem(item) {
             </div>
             <slot></slot>
             <q-space />
-            <add-media-button v-if="allowEdits" @click="onClickItem" />
+            <add-media-button v-if="allowEdits" @click="emit('add', item);" />
             <q-btn v-if="allowEdits"
                    class="state-btn text-caption text-bold"
                    color="red"
@@ -61,11 +49,17 @@ function onClickItem(item) {
                 v-show="!showGridView"
                 @click="emit('toggle-fullscreen')" />
         </div>
-        <FilterList
-            :filters="filters"
-            @add-filter="onAddFilter"
-            @remove-filter="onRemoveFilter"
-            @remove-filters="filters = []"
-            ref="filterList" />
+        <div>
+            <q-input v-model="search"
+                     class="fit-content"
+                     label="Search by Title"
+                     type="search"
+                     @update:model-value="onSearch"
+                     filled dense>
+                <template #append>
+                    <q-btn icon="search" @click="onSearch" flat />
+                </template>
+            </q-input>
+        </div>
     </div>
 </template>

@@ -18,7 +18,7 @@ const {qDark} = useDarkTheme();
 const newMediaItem = ref(new Media(new Book()));
 const editMediaItem = ref({});
 const moveMediaItem = ref(null);
-const tableTitle = ref('Your Media List');
+const tableTitle = ref('Media List');
 const expanded = ref({});
 
 const columns = ref([
@@ -44,9 +44,9 @@ const columns = ref([
     },
 ]);
 
+const search = ref(null);
 const visible = ref([ 'title', 'type' ]);
 const selected = ref([]);
-const filters = ref([]);
 const confirmDialog = ref(false);
 const fullscreen = ref(false);
 
@@ -74,19 +74,11 @@ const props = defineProps({
 const emit = defineEmits(['add-media', 'update-media', 'remove-media']);
 
 const computedList = computed(() => {
-    for (const filter of filters.value) {
-        filter.filteredCount = 0;
+    if (search.value) {
+        return props.mediaCollection?.filter((mediaItem) => mediaItem?.media?.title?.includes(search.value));
+    } else {
+        return props.mediaCollection;
     }
-
-    return props.mediaCollection?.filter((mediaItem) => {
-        for (const filter of filters.value) {
-            if (!filter?.matchFilter(mediaItem)) {
-                filter.filteredCount++;
-                return false;
-            }
-        }
-        return true;
-    });
 });
 
 const computedSelectAll = computed({
@@ -280,9 +272,10 @@ defineExpose({top});
                              :show-grid-view="tab === 'grid'"
                              :selected="selected"
                              :allow-edits="allowEdits"
-                             @click-add="onClickAddBtn"
-                             @click-delete="onClickDeleteBtn"
-                             @toggle-fullscreen="fullscreen = !fullscreen">
+                             @add="onClickAddBtn"
+                             @delete="onClickDeleteBtn"
+                             @search="(newSearch) => search = newSearch"
+                             @fullscreen="fullscreen = !fullscreen">
                 <q-checkbox v-if="allowEdits && tab === 'grid'" class="q-ml-xs" color="grey-8" v-model="computedSelectAll" :disable="mediaCollection.length < 1" />
             </MediaListHeader>
         </template>

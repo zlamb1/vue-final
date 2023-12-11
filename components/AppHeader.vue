@@ -28,17 +28,17 @@ const isAdmin = computed(() => {
             </div>
             <div class="row items-center q-gutter-x-md q-mx-md">
                 <slot></slot>
-                <div v-if="!!user?.public" class="row items-center">
+                <div v-if="user?.loading" class="row items-center">
                     <q-btn class="user-btn row items-center"
                            :color="computedColor"
                            size="md"
                            flat no-caps>
                         <q-skeleton v-if="user?.loading" style="min-width: 100px;" type="text" />
-                        <span v-else class="display-name text-bold">
+                        <span v-else-if="user?.public" class="display-name text-bold">
                             {{user?.public?.displayName}}
                         </span>
                         <q-skeleton v-if="user?.loading" class="on-right" type="QAvatar" />
-                        <UserAvatar class="on-right" :display-name="user?.public?.displayName" :photo-url="user?.public?.photoURL" />
+                        <UserAvatar v-else-if="user?.public" class="on-right" :display-name="user?.public?.displayName" :photo-url="user?.public?.photoURL" />
                         <q-menu class="overflow-auto" fit>
                             <q-list class="text-white text-bold">
                                 <q-item class="bg-accent row justify-between"
