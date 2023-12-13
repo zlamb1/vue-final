@@ -44,7 +44,7 @@ defineExpose({focusFirstInput});
         ref="firstInput"
         stack-label>
     </q-input>
-    <array-input label="Director" :allow-zero-inputs="true" v-model="media.directors" />
+    <array-input class="q-mt-xl" label="Director" :allow-zero-inputs="true" v-model="media.directors" />
     <q-date
         class="q-my-lg"
         title="Release Date"
