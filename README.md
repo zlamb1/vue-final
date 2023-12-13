@@ -1,6 +1,9 @@
 # Vue Final Project
 Deployed at: https://vue-final.vercel.app
 
+## Example Avatar
+https://cdn-icons-png.flaticon.com/128/3135/3135715.png
+
 ## Firebase Security Rules
 ![image](https://github.com/zlamb1/vue-final/assets/102142742/f0630d6c-073e-46fd-999c-a74d017bc43b)
 
