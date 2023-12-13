@@ -263,10 +263,16 @@ defineExpose({top});
         :selection="allowEdits ? 'multiple' : 'none'"
         :fullscreen="fullscreen"
         :flat="qDark"
+        :loading="mediaCollection?.loading"
         @fullscreen="onToggleFullscreen"
         @keydown.esc="fullscreen = false"
         ref="table"
         square>
+        <template #loading>
+            <QInnerLoading :showing="mediaCollection?.loading">
+                <QSpinnerHourglass size="lg" color="primary" />
+            </QInnerLoading>
+        </template>
         <template #top>
             <MediaListHeader :table-title="tableTitle"
                              :show-grid-view="tab === 'grid'"

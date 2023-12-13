@@ -45,7 +45,7 @@ const isAdmin = computed(() => {
                                         to="/profile"
                                         clickable
                                         v-close-popup>
-                                    <q-item-section>Profile</q-item-section>
+                                    <q-item-section no-wrap>Profile</q-item-section>
                                     <q-item-section avatar>
                                         <q-icon class="icon" size="sm" name="person" />
                                     </q-item-section>
@@ -54,7 +54,7 @@ const isAdmin = computed(() => {
                                         to="/lists"
                                         clickable
                                         v-close-popup>
-                                    <q-item-section>Browse Lists</q-item-section>
+                                    <q-item-section no-wrap>Browse Lists</q-item-section>
                                     <q-item-section avatar>
                                         <q-icon class="icon" size="sm" name="list" />
                                     </q-item-section>
@@ -64,7 +64,7 @@ const isAdmin = computed(() => {
                                         to="/users"
                                         clickable
                                         v-close-popup>
-                                    <q-item-section class="no-wrap">Browse Users</q-item-section>
+                                    <q-item-section no-wrap>Browse Users</q-item-section>
                                     <q-item-section avatar>
                                         <q-icon class="icon" size="sm" name="admin_panel_settings" />
                                     </q-item-section>
@@ -74,7 +74,7 @@ const isAdmin = computed(() => {
                                         to="/settings"
                                         clickable
                                         v-close-popup>
-                                    <q-item-section>Settings</q-item-section>
+                                    <q-item-section no-wrap>Settings</q-item-section>
                                     <q-item-section avatar>
                                         <q-icon class="icon" size="sm" name="settings" />
                                     </q-item-section>
@@ -83,7 +83,7 @@ const isAdmin = computed(() => {
                                         @click="signOutUser"
                                         clickable
                                         v-close-popup>
-                                    <q-item-section>Log Out</q-item-section>
+                                    <q-item-section no-wrap>Log Out</q-item-section>
                                     <q-item-section avatar>
                                         <q-icon class="icon" size="sm" name="logout" />
                                     </q-item-section>

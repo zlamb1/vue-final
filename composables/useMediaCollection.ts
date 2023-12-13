@@ -36,7 +36,8 @@ const mediaConverter = {
     }
 }
 
-export default function useMediaCollection(uid: computed, onError = (err: Error) => {}) {
+// @ts-ignore
+export default function useMediaCollection(uid, onError = (err: Error) => {}) {
     const mediaCollection = reactive(MediaCollection([]));
     
     const db = useFirestore();
@@ -92,13 +93,16 @@ export default function useMediaCollection(uid: computed, onError = (err: Error)
         }
         // @ts-ignore
         mediaCollection.sort((m1, m2) => m1?.media?.title?.localeCompare(m2?.media?.title));
+        mediaCollection.loading = false;
     }
 
     const createSnapshot = () => {
+        mediaCollection.loading = true;
         if (uid.value) {
             const docRef = doc(collection(db, 'lists'), uid.value).withConverter(mediaConverter);
             unsubscribe = onSnapshot(docRef, onDocUpdate, onError);
         } else {
+            // @ts-ignore
             useUser(undefined, (user) => {
                 unsubscribe();
                 if (user?.uid) {
